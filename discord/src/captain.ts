@@ -3,6 +3,7 @@ import { web3, Program, Idl, Provider, Wallet } from '@project-serum/anchor'
 import { getAnchoriteAddressAndBump, hashAuthorTag } from './util'
 
 export type CaptainParameters = {
+  acceptedGms: string[]
   channelId: string
   clusterEndpoint: string
   keypairPath: string
@@ -16,10 +17,13 @@ export default class Captain {
 
   constructor(public readonly version: string, private readonly params: CaptainParameters) {
     this.client = new Client({
-      intents: [Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS]
+      intents: [
+        Intents.FLAGS.GUILD_MESSAGES,
+        Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+        Intents.FLAGS.DIRECT_MESSAGES
+      ]
     })
     this.keypair = web3.Keypair.fromSecretKey(Uint8Array.from([])) // FIXME:
-    this._setupClientEventHandlers()
   }
 
   async initialize() {
@@ -40,7 +44,9 @@ export default class Captain {
 
     const wallet = new Wallet(this.keypair)
     const provider = new Provider(new web3.Connection(this.params.clusterEndpoint), wallet, {})
+
     this.program = new Program(idl, this.params.programId, provider)
+    this._setupClientEventHandlers()
   }
 
   async run(token: string) {
@@ -64,13 +70,19 @@ export default class Captain {
   private async _onMessage(msg: Message) {
     if (msg.channelId !== this.params.channelId || msg.author.bot) return
 
-    const first = msg.content.trim().split(' ')[0].toLowerCase()
+    const isGm: boolean = this.params.acceptedGms.some(gm => msg.content.trim().startsWith(gm))
 
-    if (first === 'gm' || first === 'gmoot') {
+    if (isGm) {
       const tagHash: Buffer = hashAuthorTag(msg.author.tag)
+      const [pubkey, _bump] = await getAnchoriteAddressAndBump(this.program!.programId, tagHash)
+      const listener = this.program!.account.anchorite.subscribe(pubkey, 'confirmed')
 
       try {
-        const [pubkey, _bump] = await getAnchoriteAddressAndBump(this.program!.programId, tagHash)
+        listener.once('change', async (data: any) => {
+          if (data.streak > 3) {
+            await msg.edit(`${msg.content} (🔥 ${data.streak})`)
+          }
+        })
 
         const tx = this.program!.transaction.gm(
           { value: tagHash },
@@ -87,6 +99,10 @@ export default class Captain {
         await msg.react(':coffee:')
       } catch (e) {
         console.error(`GM instruction failure: ${e}`)
+        await msg.delete()
+      } finally {
+        listener.removeAllListeners()
+        await this.program!.account.anchorite.unsubscribe(pubkey)
       }
     }
   }
