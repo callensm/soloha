@@ -1,0 +1,12 @@
+[programs.localnet]
+ahoy = "AHY7Dybe8eBiri3EAut4KPWtVNc7hoZHtbVNJh9EUmsm"
+
+[registry]
+url = "https://anchor.projectserum.com"
+
+[provider]
+cluster = "localnet"
+wallet = "~/.config/solana/id.json"
+
+[scripts]
+test = "npx ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
