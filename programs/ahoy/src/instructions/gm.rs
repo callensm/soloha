@@ -8,17 +8,15 @@ const ONE_DAY: u64 = 86_400;
 #[instruction(tag: TagHash)]
 pub struct GM<'info> {
     pub authority: Signer<'info>,
-    pub owner: UncheckedAccount<'info>,
 
     #[account(
         mut,
         seeds = [
             seeds::ANCHORITE,
-            tag.value.as_ref(),
-            owner.key().as_ref()
+            tag.value.as_ref()
         ],
         bump = anchorite.bump[0],
-        has_one = owner,
+        constraint = anchorite.owner != authority.key(),
     )]
     pub anchorite: Box<Account<'info, Anchorite>>,
 
@@ -39,5 +37,6 @@ pub fn handler(ctx: Context<GM>, _tag: TagHash) -> ProgramResult {
 
     anchorite.last_gm = ctx.accounts.clock.unix_timestamp as u64;
     anchorite.streak = anchorite.streak.checked_add(1).unwrap();
+    anchorite.total = anchorite.total.checked_add(1).unwrap();
     Ok(())
 }

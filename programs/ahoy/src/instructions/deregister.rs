@@ -1,3 +1,17 @@
+// Copyright 2021 Matthew Callens
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 use anchor_lang::prelude::*;
 
 use crate::{seeds, Anchorite, TagHash};
@@ -12,8 +26,7 @@ pub struct Deregister<'info> {
         mut,
         seeds = [
             seeds::ANCHORITE,
-            tag.value.as_ref(),
-            owner.key().as_ref()
+            tag.value.as_ref()
         ],
         bump = anchorite.bump[0],
         has_one = owner,
@@ -22,6 +35,18 @@ pub struct Deregister<'info> {
     pub anchorite: Account<'info, Anchorite>,
 }
 
-pub fn handler(_ctx: Context<Deregister>, _tag: TagHash) -> ProgramResult {
+#[event]
+pub struct ClosedAnchorite {
+    #[index]
+    pub pubkey: Pubkey,
+    pub gms: u16,
+}
+
+pub fn handler(ctx: Context<Deregister>, _tag: TagHash) -> ProgramResult {
+    emit!(ClosedAnchorite {
+        pubkey: ctx.accounts.anchorite.key(),
+        gms: ctx.accounts.anchorite.total,
+    });
+
     Ok(())
 }
