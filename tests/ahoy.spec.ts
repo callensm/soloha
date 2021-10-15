@@ -32,7 +32,7 @@ describe('ahoy', () => {
 
     before(async () => {
       ;[anchoriteKey, anchoriteBump] = await anchor.web3.PublicKey.findProgramAddress(
-        [Buffer.from('anchorite'), Buffer.from(tagHash), owner.publicKey.toBytes()],
+        [Buffer.from('anchorite'), Buffer.from(tagHash)],
         program.programId
       )
 
@@ -71,9 +71,7 @@ describe('ahoy', () => {
       await program.rpc.gm({ value: tagHash }, {
         accounts: {
           authority: authority.publicKey,
-          owner: owner.publicKey,
-          anchorite: anchoriteKey,
-          clock: anchor.web3.SYSVAR_CLOCK_PUBKEY
+          anchorite: anchoriteKey
         },
         signers: [authority]
       } as anchor.Context)
@@ -94,9 +92,7 @@ describe('ahoy', () => {
         program.rpc.gm({ value: tagHash }, {
           accounts: {
             authority: authority.publicKey,
-            owner: owner.publicKey,
-            anchorite: anchoriteKey,
-            clock: anchor.web3.SYSVAR_CLOCK_PUBKEY
+            anchorite: anchoriteKey
           },
           signers: [authority]
         } as anchor.Context)

@@ -89,8 +89,7 @@ export default class Captain {
           {
             accounts: {
               authority: this.keypair.publicKey,
-              anchorite: pubkey,
-              clock: web3.SYSVAR_CLOCK_PUBKEY
+              anchorite: pubkey
             }
           }
         )

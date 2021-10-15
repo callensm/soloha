@@ -19,13 +19,11 @@ pub struct GM<'info> {
         constraint = anchorite.owner != authority.key(),
     )]
     pub anchorite: Box<Account<'info, Anchorite>>,
-
-    pub clock: Sysvar<'info, Clock>,
 }
 
 pub fn handler(ctx: Context<GM>, _tag: TagHash) -> ProgramResult {
     let anchorite = &mut ctx.accounts.anchorite;
-    let current_time = ctx.accounts.clock.unix_timestamp as u64;
+    let current_time = Clock::get()?.unix_timestamp as u64;
 
     let elapsed_since: u64 = current_time.checked_sub(anchorite.last_gm).unwrap();
 
@@ -35,7 +33,7 @@ pub fn handler(ctx: Context<GM>, _tag: TagHash) -> ProgramResult {
         anchorite.streak = 0;
     }
 
-    anchorite.last_gm = ctx.accounts.clock.unix_timestamp as u64;
+    anchorite.last_gm = current_time;
     anchorite.streak = anchorite.streak.checked_add(1).unwrap();
     anchorite.total = anchorite.total.checked_add(1).unwrap();
     Ok(())
