@@ -1,13 +1,14 @@
+import { readFileSync } from 'fs'
 import { Client, Intents, Message } from 'discord.js'
-import { web3, Program, Idl, Provider, Wallet } from '@project-serum/anchor'
+import { web3, Program, Provider, Wallet } from '@project-serum/anchor'
 import { getAnchoriteAddressAndBump, hashAuthorTag } from './util'
 
 export type CaptainParameters = {
   acceptedGms: string[]
   channelId: string
   clusterEndpoint: string
+  idl: any
   keypairPath: string
-  programId: string
 }
 
 export default class Captain {
@@ -18,35 +19,30 @@ export default class Captain {
   constructor(public readonly version: string, private readonly params: CaptainParameters) {
     this.client = new Client({
       intents: [
+        Intents.FLAGS.GUILDS,
         Intents.FLAGS.GUILD_MESSAGES,
-        Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-        Intents.FLAGS.DIRECT_MESSAGES
+        Intents.FLAGS.GUILD_MESSAGE_REACTIONS
       ]
     })
-    this.keypair = web3.Keypair.fromSecretKey(Uint8Array.from([])) // FIXME:
+
+    this.keypair = web3.Keypair.fromSecretKey(
+      Buffer.from(
+        JSON.parse(
+          readFileSync(this.params.keypairPath, {
+            encoding: 'utf-8'
+          })
+        )
+      )
+    )
+
+    this.client.once('ready', this._onReady)
+    this.client.on('messageCreate', this._onMessage)
   }
 
   async initialize() {
-    let idl: Idl
-
-    try {
-      const i = await Program.fetchIdl(this.params.programId)
-
-      if (!i) {
-        throw Error('received null idl from fetch')
-      }
-
-      idl = i
-    } catch (e) {
-      console.error(`Failed to initialize: ${e}`)
-      process.exit(1)
-    }
-
     const wallet = new Wallet(this.keypair)
     const provider = new Provider(new web3.Connection(this.params.clusterEndpoint), wallet, {})
-
-    this.program = new Program(idl, this.params.programId, provider)
-    this._setupClientEventHandlers()
+    this.program = new Program(this.params.idl, this.params.idl.metadata.address, provider)
   }
 
   async run(token: string) {
@@ -58,21 +54,18 @@ export default class Captain {
     }
   }
 
-  /**
-   * Setups up all of the event handlers for the Discord client.
-   * @private
-   * @memberof Captain
-   */
-  private _setupClientEventHandlers() {
-    this.client.on('message', this._onMessage)
+  private _onReady = () => {
+    console.log(`Logged in as ${this.client.user?.tag}`)
   }
 
-  private async _onMessage(msg: Message) {
+  private _onMessage = async (msg: Message) => {
     if (msg.channelId !== this.params.channelId || msg.author.bot) return
 
     const isGm: boolean = this.params.acceptedGms.some(gm => msg.content.trim().startsWith(gm))
 
     if (isGm) {
+      console.log(`GM from ${msg.author.tag}`)
+
       const tagHash: Buffer = hashAuthorTag(msg.author.tag)
       const [pubkey, _bump] = await getAnchoriteAddressAndBump(this.program!.programId, tagHash)
       const listener = this.program!.account.anchorite.subscribe(pubkey, 'confirmed')
