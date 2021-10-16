@@ -1,0 +1,51 @@
+{
+  "name": "@ahoy/app",
+  "private": true,
+  "author": "Matthew Callens <callensmatt@gmail.com>",
+  "scripts": {
+    "build": "npm run clean && craco build",
+    "clean": "rm -rf build/",
+    "lint": "eslint src/ && prettier src/ --check",
+    "fmt": "prettier src/ --write",
+    "serve": "serve -s build -p 3000",
+    "start": "craco start"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^4.7.0",
+    "@project-serum/anchor": "^0.17.1-beta.1",
+    "@solana/wallet-adapter-base": "^0.6.0",
+    "@solana/wallet-adapter-react": "^0.12.5",
+    "@solana/wallet-adapter-wallets": "^0.10.1",
+    "antd": "^4.16.13",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  },
+  "devDependencies": {
+    "@craco/craco": "^6.3.0",
+    "@types/node": "^16.11.0",
+    "@types/react": "^17.0.30",
+    "@types/react-dom": "^17.0.9",
+    "craco-less": "^1.20.0",
+    "prettier": "^2.4.1",
+    "react-scripts": "^4.0.3",
+    "serve": "^12.0.1",
+    "typescript": "^4.4.4"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app"
+    ]
+  }
+}
