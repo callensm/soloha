@@ -14,8 +14,10 @@
 
 pub mod deregister;
 pub mod gm;
+pub mod initialize;
 pub mod register;
 
 pub use deregister::*;
 pub use gm::*;
+pub use initialize::*;
 pub use register::*;

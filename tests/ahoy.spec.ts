@@ -19,12 +19,38 @@ describe('ahoy', () => {
   let anchoriteKey: anchor.web3.PublicKey
   let anchoriteBump: number
 
+  let stateKey: anchor.web3.PublicKey
+  let stateBump: number
+
   before(async () => {
     const sig = await program.provider.connection.requestAirdrop(
       owner.publicKey,
       50 * anchor.web3.LAMPORTS_PER_SOL
     )
     await program.provider.connection.confirmTransaction(sig)
+  })
+
+  describe('initialize instruction', () => {
+    before(async () => {
+      ;[stateKey, stateBump] = await anchor.web3.PublicKey.findProgramAddress(
+        [Buffer.from('state')],
+        program.programId
+      )
+
+      await program.rpc.initialize(stateBump, {
+        accounts: {
+          authority: authority.publicKey,
+          state: stateKey,
+          systemProgram: anchor.web3.SystemProgram.programId
+        },
+        signers: [authority]
+      } as anchor.Context)
+    })
+
+    it('creates the global state pda', async () => {
+      const state = await program.account.ahoyState.all()
+      assert.lengthOf(state, 1)
+    })
   })
 
   describe('register instruction', () => {
@@ -39,6 +65,7 @@ describe('ahoy', () => {
       await program.rpc.register({ value: tagHash }, anchoriteBump, {
         accounts: {
           owner: owner.publicKey,
+          state: stateKey,
           anchorite: anchoriteKey,
           systemProgram: anchor.web3.SystemProgram.programId
         },
@@ -48,7 +75,7 @@ describe('ahoy', () => {
 
     it('creates a new anchorite account for the user', async () => {
       const anchorites = await program.account.anchorite.all()
-      assert.strictEqual(anchorites.length, 1)
+      assert.lengthOf(anchorites, 1)
 
       testAnchorite = anchorites[0]
       assert.isTrue(testAnchorite.publicKey.equals(anchoriteKey))
@@ -62,6 +89,11 @@ describe('ahoy', () => {
     it('zeroes the timestamp of the last gm by default', () => {
       assert.strictEqual((testAnchorite.account.lastGm as anchor.BN).toNumber(), 0)
     })
+
+    it('adds one to global registered counter', async () => {
+      const state = await program.account.ahoyState.fetch(stateKey)
+      assert.strictEqual((state.registered as anchor.BN).toNumber(), 1)
+    })
   })
 
   describe('gm instruction', () => {
@@ -71,6 +103,7 @@ describe('ahoy', () => {
       await program.rpc.gm({ value: tagHash }, {
         accounts: {
           authority: authority.publicKey,
+          state: stateKey,
           anchorite: anchoriteKey
         },
         signers: [authority]
@@ -98,6 +131,12 @@ describe('ahoy', () => {
         } as anchor.Context)
       )
     })
+
+    it('updates the global state streak number and owner', async () => {
+      const state = await program.account.ahoyState.fetch(stateKey)
+      assert.strictEqual(state.highestStreak, 1)
+      assert.isTrue((state.highestStreakOwner as anchor.web3.PublicKey).equals(owner.publicKey))
+    })
   })
 
   describe('deregister instruction', () => {
@@ -105,6 +144,7 @@ describe('ahoy', () => {
       await program.rpc.deregister({ value: tagHash }, {
         accounts: {
           owner: owner.publicKey,
+          state: stateKey,
           anchorite: anchoriteKey
         },
         signers: [owner]
@@ -114,6 +154,11 @@ describe('ahoy', () => {
     it('closes the anchorite account passed', async () => {
       const anchorites = await program.account.anchorite.all()
       assert.isEmpty(anchorites)
+    })
+
+    it('updates global state to decrement registered count', async () => {
+      const state = await program.account.ahoyState.fetch(stateKey)
+      assert.strictEqual((state.registered as anchor.BN).toNumber(), 0)
     })
   })
 })

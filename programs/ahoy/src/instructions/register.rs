@@ -14,13 +14,22 @@
 
 use anchor_lang::prelude::*;
 
-use crate::{seeds, TagHash};
+use crate::{seeds, AhoyState, TagHash};
 
 #[derive(Accounts)]
 #[instruction(tag: TagHash, bump: u8)]
 pub struct Register<'info> {
     #[account(mut)]
     pub owner: Signer<'info>,
+
+    #[account(
+        mut,
+        seeds = [
+            seeds::STATE
+        ],
+        bump = state.bump[0],
+    )]
+    pub state: Box<Account<'info, AhoyState>>,
 
     #[account(
         init,
@@ -57,6 +66,9 @@ pub fn handler(ctx: Context<Register>, _tag: TagHash, bump: u8) -> ProgramResult
     anchorite.owner = ctx.accounts.owner.key();
     anchorite.last_gm = u64::default();
     anchorite.bump = [bump];
+
+    let state = &mut ctx.accounts.state;
+    state.registered = state.registered.checked_add(1).unwrap();
 
     emit!(NewAnchorite {
         pubkey: anchorite.key()

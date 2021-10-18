@@ -22,11 +22,16 @@ declare_id!("AHY7Dybe8eBiri3EAut4KPWtVNc7hoZHtbVNJh9EUmsm");
 
 mod seeds {
     pub const ANCHORITE: &[u8] = b"anchorite";
+    pub const STATE: &[u8] = b"state";
 }
 
 #[program]
 pub mod ahoy {
     use super::*;
+
+    pub fn initialize(ctx: Context<InitializeState>, bump: u8) -> ProgramResult {
+        instructions::initialize::handler(ctx, bump)
+    }
 
     pub fn register(ctx: Context<Register>, tag: TagHash, bump: u8) -> ProgramResult {
         instructions::register::handler(ctx, tag, bump)

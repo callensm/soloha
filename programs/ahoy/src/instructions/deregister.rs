@@ -14,13 +14,22 @@
 
 use anchor_lang::prelude::*;
 
-use crate::{seeds, Anchorite, TagHash};
+use crate::{seeds, AhoyState, Anchorite, TagHash};
 
 #[derive(Accounts)]
 #[instruction(tag: TagHash)]
 pub struct Deregister<'info> {
     #[account(mut)]
     pub owner: Signer<'info>,
+
+    #[account(
+        mut,
+        seeds = [
+            seeds::STATE
+        ],
+        bump = state.bump[0],
+    )]
+    pub state: Box<Account<'info, AhoyState>>,
 
     #[account(
         mut,
@@ -43,6 +52,9 @@ pub struct ClosedAnchorite {
 }
 
 pub fn handler(ctx: Context<Deregister>, _tag: TagHash) -> ProgramResult {
+    let state = &mut ctx.accounts.state;
+    state.registered = state.registered.checked_sub(1).unwrap();
+
     emit!(ClosedAnchorite {
         pubkey: ctx.accounts.anchorite.key(),
         gms: ctx.accounts.anchorite.total,
