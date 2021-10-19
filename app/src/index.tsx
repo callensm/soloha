@@ -1,7 +1,5 @@
 import { StrictMode } from 'react'
 import { render } from 'react-dom'
-import { notification } from 'antd'
-import { WalletError } from '@solana/wallet-adapter-base'
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react'
 import {
   getPhantomWallet,
@@ -22,18 +20,10 @@ const enabledWallets: Wallet[] = [
   getSlopeWallet()
 ]
 
-const onWalletError = (err: WalletError) => {
-  notification.error({
-    message: 'Wallet Connection Error',
-    description: err.message,
-    placement: 'bottomLeft'
-  })
-}
-
 render(
   <StrictMode>
     <ConnectionProvider endpoint={'http://127.0.0.1:8899'}>
-      <WalletProvider wallets={enabledWallets} onError={onWalletError}>
+      <WalletProvider wallets={enabledWallets}>
         <App />
       </WalletProvider>
     </ConnectionProvider>

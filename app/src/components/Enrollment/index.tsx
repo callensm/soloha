@@ -1,9 +1,11 @@
-import { FunctionComponent, useEffect, useState } from 'react'
-import { Avatar, Comment } from 'antd'
-import { web3, BN, ProgramAccount } from '@project-serum/anchor'
+import { FunctionComponent, useCallback, useEffect, useState } from 'react'
+import { Avatar, Comment, notification, Spin } from 'antd'
+import { web3, BN, Context, ProgramAccount } from '@project-serum/anchor'
+import { useWallet } from '@solana/wallet-adapter-react'
 import dayjs from 'dayjs'
 import Coffee from './Coffee'
-import { useAnchor } from '../../context/anchor'
+import { useAnchor } from '../../lib/anchor'
+import { getAnchoriteProgramAddress, getStateProgramAddress, hashAuthorTag } from '../../lib/util'
 
 interface EnrollmentProps {
   anchorite?: ProgramAccount
@@ -11,34 +13,110 @@ interface EnrollmentProps {
 
 const Enrollment: FunctionComponent<EnrollmentProps> = props => {
   const program = useAnchor()
+  const { publicKey, ready, sendTransaction } = useWallet()
 
   const [registeredCount, setRegisteredCount] = useState<number>(0)
+  const [loading, setLoading] = useState<boolean>(false)
 
   useEffect(() => {
-    web3.PublicKey.findProgramAddress([Buffer.from('state')], program.programId)
+    getStateProgramAddress(program.programId)
       .then(([stateKey]) => program.account.ahoyState.fetch(stateKey))
-      .then((state: any) => {
-        setRegisteredCount((state.registered as BN).toNumber())
+      .then((state: any) => setRegisteredCount((state.registered as BN).toNumber()))
+      .catch(err => {
+        notification.error({
+          message: 'Ahoy State Fetch Error',
+          description: (err as Error).message,
+          placement: 'bottomLeft',
+          duration: 20
+        })
       })
-      .catch(console.error)
   }, [program])
 
+  const handleCoffeeClick = useCallback(async () => {
+    if (!publicKey) return
+
+    setLoading(true)
+
+    const [stateKey] = await getStateProgramAddress(program.programId)
+
+    const tagHash = { value: hashAuthorTag('@synxe#6138') }
+    const [anchoriteKey, anchoriteBump] = await getAnchoriteProgramAddress(
+      tagHash.value,
+      program.programId
+    )
+
+    let tx: web3.Transaction
+
+    try {
+      if (props.anchorite) {
+        tx = program.transaction.deregister(tagHash, {
+          accounts: {
+            owner: publicKey,
+            state: stateKey,
+            anchorite: anchoriteKey
+          }
+        } as Context)
+      } else {
+        tx = program.transaction.register(tagHash, anchoriteBump, {
+          accounts: {
+            owner: publicKey,
+            state: stateKey,
+            anchorite: anchoriteKey,
+            systemProgram: web3.SystemProgram.programId
+          }
+        } as Context)
+      }
+
+      const signature = await sendTransaction(tx, program.provider.connection)
+      await program.provider.connection.confirmTransaction(signature, 'confirmed')
+
+      notification.success({
+        message: 'Transaction Success',
+        description: (
+          <a target="_blank" rel="noreferrer" href={`https://explorer.solana.com/tx/${signature}`}>
+            View on Explorer
+          </a>
+        ),
+        placement: 'bottomLeft',
+        duration: 20
+      })
+    } catch (err) {
+      notification.error({
+        message: 'Transaction Error',
+        description: (err as Error).message,
+        placement: 'bottomLeft',
+        duration: 20
+      })
+    } finally {
+      setLoading(false)
+    }
+  }, [props.anchorite, program, publicKey, sendTransaction])
+
   return (
-    <div
-      style={{
-        border: '1px solid rgba(255, 255, 255, 0.15)',
-        borderRadius: 10,
-        padding: '1em 3em 1em 3em'
-      }}
-    >
-      <Comment
-        author="Captain"
-        avatar={<Avatar src="/anchor_logo.png" size="large" shape="circle" />}
-        content="gm"
-        datetime={`Today at ${dayjs().format('h:mm A')}`}
-        actions={[<Coffee count={registeredCount} isRegistered={props.anchorite !== undefined} />]}
-      />
-    </div>
+    <Spin spinning={loading}>
+      <div
+        style={{
+          border: '1px solid rgba(255, 255, 255, 0.15)',
+          borderRadius: 10,
+          padding: '1em 3em 1em 3em'
+        }}
+      >
+        <Comment
+          author="Captain"
+          avatar={<Avatar src="/anchor_logo.png" size="large" shape="circle" />}
+          content="gm - react to my message to register or deregister"
+          datetime={`Today at ${dayjs().format('h:mm A')}`}
+          actions={[
+            <Coffee
+              count={registeredCount}
+              enabled={publicKey !== null && ready}
+              isRegistered={props.anchorite !== undefined}
+              onClick={handleCoffeeClick}
+            />
+          ]}
+        />
+      </div>
+    </Spin>
   )
 }
 

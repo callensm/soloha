@@ -1,11 +1,13 @@
-import { CSSProperties, FunctionComponent, useEffect, useMemo, useState } from 'react'
-import { Divider, Layout, Typography } from 'antd'
+import { CSSProperties, FunctionComponent, useEffect, useState } from 'react'
+import { Layout, Typography } from 'antd'
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
 import { useWallet } from '@solana/wallet-adapter-react'
-import { ProgramAccount, web3 } from '@project-serum/anchor'
+import { ProgramAccount } from '@project-serum/anchor'
+import { CoffeeOutlined } from '@ant-design/icons'
 import Header from './components/Header'
 import Enrollment from './components/Enrollment'
-import { useAnchor } from './context/anchor'
+import { useAnchor } from './lib/anchor'
+import { getAnchoriteProgramAddress, hashAuthorTag } from './lib/util'
 
 const { Content } = Layout
 
@@ -18,10 +20,7 @@ const App: FunctionComponent = () => {
   useEffect(() => {
     if (!publicKey || !ready) return
 
-    web3.PublicKey.findProgramAddress(
-      [Buffer.from('anchorite'), publicKey.toBytes()],
-      program.programId
-    )
+    getAnchoriteProgramAddress(hashAuthorTag('@synxe#6138'), program.programId)
       .then(([key]) => program.account.anchorite.fetchNullable(key))
       .then((acc: any | null) => {
         if (acc) {
@@ -31,23 +30,22 @@ const App: FunctionComponent = () => {
       .catch(console.error)
   }, [program, publicKey, ready])
 
-  const modalLogo = useMemo(
-    () => <img src="/anchor_logo.png" alt="anchor-logo" height="100%" />,
-    []
-  )
-
   return (
     <>
       <Layout>
-        <WalletModalProvider logo={modalLogo} featuredWallets={5}>
+        <WalletModalProvider
+          logo={<img src="/anchor_logo.png" alt="anchor-logo" height="100%" />}
+          featuredWallets={5}
+        >
           <Header />
         </WalletModalProvider>
         <Content style={contentStyle}>
-          <Typography.Title>Ahoy!</Typography.Title>
-          <Typography.Title level={3} style={{ marginTop: 0 }}>
-            Saying "gm" goes a long way.
+          <Typography.Title>
+            Ahoy! <CoffeeOutlined />
           </Typography.Title>
-          <Divider />
+          <Typography.Title level={3} style={{ marginTop: 0, marginBottom: '2em' }}>
+            Make saying "gm" a little more meaningful.
+          </Typography.Title>
           <Enrollment anchorite={anchorite} />
         </Content>
       </Layout>
