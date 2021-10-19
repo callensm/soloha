@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs'
 import { Client, Intents, Message } from 'discord.js'
-import { web3, Program, Provider, Wallet } from '@project-serum/anchor'
+import { web3, Program, Provider, Wallet, Context } from '@project-serum/anchor'
 import { getAnchoriteAddressAndBump, hashAuthorTag } from './util'
 
 export type CaptainParameters = {
@@ -15,6 +15,7 @@ export default class Captain {
   private client: Client
   private keypair: web3.Keypair
   private program?: Program
+  private statePublicKey: web3.PublicKey
 
   constructor(public readonly version: string, private readonly params: CaptainParameters) {
     this.client = new Client({
@@ -25,6 +26,7 @@ export default class Captain {
       ]
     })
 
+    this.statePublicKey = web3.PublicKey.default
     this.keypair = web3.Keypair.fromSecretKey(
       Buffer.from(
         JSON.parse(
@@ -43,6 +45,13 @@ export default class Captain {
     const wallet = new Wallet(this.keypair)
     const provider = new Provider(new web3.Connection(this.params.clusterEndpoint), wallet, {})
     this.program = new Program(this.params.idl, this.params.idl.metadata.address, provider)
+
+    const [key] = await web3.PublicKey.findProgramAddress(
+      [Buffer.from('state')],
+      this.program.programId
+    )
+
+    this.statePublicKey = key
   }
 
   async run(token: string) {
@@ -77,18 +86,22 @@ export default class Captain {
           }
         })
 
-        const tx = this.program!.transaction.gm(
-          { value: tagHash },
-          {
-            accounts: {
-              authority: this.keypair.publicKey,
-              anchorite: pubkey
-            }
+        const tx = this.program!.transaction.gm({ value: tagHash }, {
+          accounts: {
+            authority: this.keypair.publicKey,
+            state: this.statePublicKey,
+            anchorite: pubkey
           }
+        } as Context)
+
+        await web3.sendAndConfirmTransaction(
+          this.program!.provider.connection,
+          tx,
+          [this.keypair],
+          { commitment: 'confirmed' }
         )
 
-        await web3.sendAndConfirmTransaction(this.program!.provider.connection, tx, [this.keypair])
-        await msg.react(':coffee:')
+        await msg.react('☕')
       } catch (e) {
         console.error(`GM instruction failure: ${e}`)
         await msg.delete()

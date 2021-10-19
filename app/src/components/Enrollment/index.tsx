@@ -39,7 +39,7 @@ const Enrollment: FunctionComponent<EnrollmentProps> = props => {
 
     const [stateKey] = await getStateProgramAddress(program.programId)
 
-    const tagHash = { value: hashAuthorTag('@synxe#6138') }
+    const tagHash = { value: hashAuthorTag('synxe#6138') }
     const [anchoriteKey, anchoriteBump] = await getAnchoriteProgramAddress(
       tagHash.value,
       program.programId

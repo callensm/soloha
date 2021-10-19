@@ -20,7 +20,7 @@ const App: FunctionComponent = () => {
   useEffect(() => {
     if (!publicKey || !ready) return
 
-    getAnchoriteProgramAddress(hashAuthorTag('@synxe#6138'), program.programId)
+    getAnchoriteProgramAddress(hashAuthorTag('synxe#6138'), program.programId)
       .then(([key]) => program.account.anchorite.fetchNullable(key))
       .then((acc: any | null) => {
         if (acc) {
