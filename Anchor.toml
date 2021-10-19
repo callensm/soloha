@@ -1,6 +1,9 @@
 [programs.localnet]
 ahoy = "AHY7Dybe8eBiri3EAut4KPWtVNc7hoZHtbVNJh9EUmsm"
 
+[programs.testnet]
+ahoy = "AHY7Dybe8eBiri3EAut4KPWtVNc7hoZHtbVNJh9EUmsm"
+
 [registry]
 url = "https://anchor.projectserum.com"
 

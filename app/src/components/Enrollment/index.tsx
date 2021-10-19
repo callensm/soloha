@@ -1,7 +1,7 @@
 import { FunctionComponent, useCallback, useEffect, useState } from 'react'
 import { Avatar, Comment, notification, Spin } from 'antd'
 import { web3, BN, Context, ProgramAccount } from '@project-serum/anchor'
-import { useWallet } from '@solana/wallet-adapter-react'
+import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import dayjs from 'dayjs'
 import Coffee from './Coffee'
 import { useAnchor } from '../../lib/anchor'
@@ -14,14 +14,27 @@ interface EnrollmentProps {
 const Enrollment: FunctionComponent<EnrollmentProps> = props => {
   const program = useAnchor()
   const { publicKey, ready, sendTransaction } = useWallet()
+  const { connection } = useConnection()
 
   const [registeredCount, setRegisteredCount] = useState<number>(0)
   const [loading, setLoading] = useState<boolean>(false)
+  const [listeners, setListeners] = useState<[number, number]>([-1, -1])
 
   useEffect(() => {
     getStateProgramAddress(program.programId)
       .then(([stateKey]) => program.account.ahoyState.fetch(stateKey))
       .then((state: any) => setRegisteredCount((state.registered as BN).toNumber()))
+      .then(() => {
+        const inc = program.addEventListener('NewAnchorite', _e =>
+          setRegisteredCount(count => count + 1)
+        )
+
+        const dec = program.addEventListener('ClosedAnchorite', _e =>
+          setRegisteredCount(count => count - 1)
+        )
+
+        setListeners([inc, dec])
+      })
       .catch(err => {
         notification.error({
           message: 'Ahoy State Fetch Error',
@@ -30,6 +43,13 @@ const Enrollment: FunctionComponent<EnrollmentProps> = props => {
           duration: 20
         })
       })
+
+    return () => {
+      program
+        .removeEventListener(listeners[0])
+        .then(() => program.removeEventListener(listeners[1]))
+        .catch(console.error)
+    }
   }, [program])
 
   const handleCoffeeClick = useCallback(async () => {
@@ -67,13 +87,13 @@ const Enrollment: FunctionComponent<EnrollmentProps> = props => {
         } as Context)
       }
 
-      const signature = await sendTransaction(tx, program.provider.connection)
-      await program.provider.connection.confirmTransaction(signature, 'confirmed')
+      const sig = await sendTransaction(tx, connection)
+      await connection.confirmTransaction(sig, 'confirmed')
 
       notification.success({
         message: 'Transaction Success',
         description: (
-          <a target="_blank" rel="noreferrer" href={`https://explorer.solana.com/tx/${signature}`}>
+          <a target="_blank" rel="noreferrer" href={`https://explorer.solana.com/tx/${sig}`}>
             View on Explorer
           </a>
         ),
