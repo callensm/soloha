@@ -48,3 +48,18 @@ jobs:
       - name: ESLint & Prettier
         working-directory: ./discord
         run: npm run lint
+
+  lint_program:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install Rust Toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Format
+        working-directory: ./programs/soloha
+        run: cargo fmt -- --check
