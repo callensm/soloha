@@ -76,7 +76,7 @@ export default class Espresso {
       console.log(`GM from ${msg.author.tag}`)
 
       const tagHash: Buffer = hashAuthorTag(msg.author.tag)
-      const [pubkey, _bump] = await getUserAddressAndBump(this.program!.programId, tagHash)
+      const [pubkey] = await getUserAddressAndBump(this.program!.programId, tagHash)
       const listener = this.program!.account.user.subscribe(pubkey, 'confirmed')
 
       try {

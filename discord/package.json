@@ -22,10 +22,15 @@
   },
   "homepage": "https://github.com/callensm/soloha/tree/master#readme",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "lint": "eslint src --ext .ts && prettier src/ --check"
   },
   "devDependencies": {
     "@types/dotenv": "^8.2.0",
+    "@typescript-eslint/eslint-plugin": "^5.1.0",
+    "@typescript-eslint/parser": "^5.1.0",
+    "eslint": "^8.0.1",
+    "prettier": "^2.4.1",
     "ts-node": "^10.3.0",
     "typescript": "^4.4.4"
   },
