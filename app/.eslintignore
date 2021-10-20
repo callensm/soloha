@@ -1,4 +1,4 @@
-lib/*.json
+next.config.js
 
 .next/
 node_modules/

@@ -1,4 +1,5 @@
 import { FunctionComponent, useCallback, useMemo } from 'react'
+import Image from 'next/image'
 import { Button, Space } from 'antd'
 import { WalletOutlined } from '@ant-design/icons'
 import { WalletNotConnectedError } from '@solana/wallet-adapter-base'
@@ -32,7 +33,15 @@ const ConnectButton: FunctionComponent<ConnectButtonProps> = _props => {
   }, [wallet, disconnect])
 
   const walletIcon = useMemo(
-    () => <img style={{ marginRight: 10 }} src={wallet?.icon} alt="wallet-icon" height="90%" />,
+    () => (
+      <Image
+        id="wallet-btn-icon"
+        src={wallet?.icon || ''}
+        alt="wallet-icon"
+        height="90%"
+        width="90%"
+      />
+    ),
     [wallet]
   )
 

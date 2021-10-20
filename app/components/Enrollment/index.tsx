@@ -1,65 +1,48 @@
-import { FunctionComponent, useCallback, useEffect, useState } from 'react'
+import { CSSProperties, FunctionComponent, useCallback, useEffect, useState } from 'react'
 import { Avatar, Comment, notification, Spin } from 'antd'
-import { web3, BN, Context, ProgramAccount } from '@project-serum/anchor'
+import { web3, Context, ProgramAccount } from '@project-serum/anchor'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import dayjs from 'dayjs'
 import Coffee from './Coffee'
-import { useAnchor } from '../../lib/anchor'
-import { getUserProgramAddress, getStateProgramAddress, hashAuthorTag } from '../../lib/util'
+import { useAnchor, useGlobalState } from '../../lib/hooks'
+import { getUserProgramAddress, getStateProgramAddress, hashDiscordTag } from '../../lib/util'
 
 interface EnrollmentProps {
-  user?: ProgramAccount
+  discordTag: string
+  user: ProgramAccount | null
 }
 
 const Enrollment: FunctionComponent<EnrollmentProps> = props => {
   const program = useAnchor()
+  const state = useGlobalState()
   const { publicKey, ready, sendTransaction } = useWallet()
   const { connection } = useConnection()
 
-  const [registeredCount, setRegisteredCount] = useState<number>(0)
   const [loading, setLoading] = useState<boolean>(false)
   const [listeners, setListeners] = useState<[number, number]>([-1, -1])
+  const [registeredCount, setRegisteredCount] = useState<number>(
+    state?.account.registered.toNumber() || 0
+  )
 
   useEffect(() => {
-    getStateProgramAddress(program.programId)
-      .then(([stateKey]) => program.account.state.fetch(stateKey))
-      .then((state: any) => setRegisteredCount((state.registered as BN).toNumber()))
-      .then(() => {
-        const inc = program.addEventListener('NewUser', _e =>
-          setRegisteredCount(count => count + 1)
-        )
-
-        const dec = program.addEventListener('ClosedUser', _e =>
-          setRegisteredCount(count => count - 1)
-        )
-
-        setListeners([inc, dec])
-      })
-      .catch(err => {
-        notification.error({
-          message: 'State Fetch Error',
-          description: (err as Error).message,
-          placement: 'bottomLeft',
-          duration: 20
-        })
-      })
+    const inc = program.addEventListener('NewUser', _e => setRegisteredCount(count => count + 1))
+    const dec = program.addEventListener('ClosedUser', _e => setRegisteredCount(count => count - 1))
+    setListeners([inc, dec])
 
     return () => {
-      program
-        .removeEventListener(listeners[0])
-        .then(() => program.removeEventListener(listeners[1]))
-        .catch(console.error)
+      if (listeners.every(l => l === -1)) return
+      if (listeners[0] !== -1) program.removeEventListener(listeners[0]).catch(console.error)
+      if (listeners[1] !== -1) program.removeEventListener(listeners[1]).catch(console.error)
     }
-  }, [program])
+  }, [program, listeners])
 
   const handleCoffeeClick = useCallback(async () => {
-    if (!publicKey) return
+    if (!publicKey || props.discordTag === '') return
 
     setLoading(true)
 
     const [stateKey] = await getStateProgramAddress(program.programId)
-
-    const tagHash = { value: hashAuthorTag('synxe#6138') }
+    const tagHash = { value: hashDiscordTag(props.discordTag) }
     const [userKey, userBump] = await getUserProgramAddress(tagHash.value, program.programId)
 
     let tx: web3.Transaction
@@ -87,37 +70,17 @@ const Enrollment: FunctionComponent<EnrollmentProps> = props => {
       const sig = await sendTransaction(tx, connection)
       await connection.confirmTransaction(sig, 'confirmed')
 
-      notification.success({
-        message: 'Transaction Success',
-        description: (
-          <a target="_blank" rel="noreferrer" href={`https://explorer.solana.com/tx/${sig}`}>
-            View on Explorer
-          </a>
-        ),
-        placement: 'bottomLeft',
-        duration: 20
-      })
+      displayExplorerNotification(sig)
     } catch (err) {
-      notification.error({
-        message: 'Transaction Error',
-        description: (err as Error).message,
-        placement: 'bottomLeft',
-        duration: 20
-      })
+      displayTransactionError(err as Error)
     } finally {
       setLoading(false)
     }
-  }, [props.user, program, publicKey, sendTransaction])
+  }, [props.discordTag, props.user, program, publicKey, sendTransaction, connection])
 
   return (
     <Spin spinning={loading}>
-      <div
-        style={{
-          border: '1px solid rgba(255, 255, 255, 0.15)',
-          borderRadius: 10,
-          padding: '1em 3em 1em 3em'
-        }}
-      >
+      <div style={containerStyle}>
         <Comment
           author="Espresso"
           avatar={<Avatar src="/anchor_logo.png" size="large" shape="circle" />}
@@ -125,9 +88,10 @@ const Enrollment: FunctionComponent<EnrollmentProps> = props => {
           datetime={`Today at ${dayjs().format('h:mm A')}`}
           actions={[
             <Coffee
+              key="coffee-tag"
               count={registeredCount}
               enabled={publicKey !== null && ready}
-              isRegistered={props.user !== undefined}
+              isRegistered={props.user !== null}
               onClick={handleCoffeeClick}
             />
           ]}
@@ -135,6 +99,44 @@ const Enrollment: FunctionComponent<EnrollmentProps> = props => {
       </div>
     </Spin>
   )
+}
+
+const containerStyle: CSSProperties = {
+  border: '1px solid rgba(255, 255, 255, 0.15)',
+  borderRadius: 10,
+  padding: '1em 3em 1em 3em'
+}
+
+/**
+ * Display an Antd success notification with a link
+ * to the transaction signature on Solana Explorer
+ * @param {string} signature
+ */
+function displayExplorerNotification(signature: string) {
+  notification.success({
+    message: 'Transaction Success',
+    description: (
+      <a target="_blank" rel="noreferrer" href={`https://explorer.solana.com/tx/${signature}`}>
+        View on Explorer
+      </a>
+    ),
+    placement: 'bottomLeft',
+    duration: 20
+  })
+}
+
+/**
+ * Display an Antd error notification with the
+ * transaction error message for the user to see
+ * @param {Error} err
+ */
+function displayTransactionError(err: Error) {
+  notification.error({
+    message: 'Transaction Error',
+    description: (err as Error).message,
+    placement: 'bottomLeft',
+    duration: 20
+  })
 }
 
 export default Enrollment

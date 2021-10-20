@@ -7,7 +7,7 @@ import crc32 from 'crc-32'
  * @param {string} tag
  * @returns {Buffer}
  */
-export const hashAuthorTag = (tag: string): Buffer => Buffer.from(crc32.str(tag).toString(16))
+export const hashDiscordTag = (tag: string): Buffer => Buffer.from(crc32.str(tag).toString(16))
 
 /**
  * Derives the public key and bump nonce for the global `State` PDA

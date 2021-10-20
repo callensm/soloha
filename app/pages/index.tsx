@@ -1,47 +1,28 @@
-import { CSSProperties, useEffect, useState } from 'react'
+import { CSSProperties, useState } from 'react'
 import type { NextPage } from 'next'
 import Head from 'next/head'
+import Image from 'next/image'
 import { Layout, Typography } from 'antd'
 import { CoffeeOutlined } from '@ant-design/icons'
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
-import type { ProgramAccount } from '@project-serum/anchor'
-import { useWallet } from '@solana/wallet-adapter-react'
 import Header from '../components/Header'
 import Enrollment from '../components/Enrollment'
-import { useAnchor } from '../lib/anchor'
-import { getUserProgramAddress, hashAuthorTag } from '../lib/util'
+import { useUser } from '../lib/hooks'
 
 const { Content } = Layout
 
 const HomePage: NextPage = () => {
-  const { publicKey, ready } = useWallet()
-  const program = useAnchor()
-
-  const [user, setUser] = useState<ProgramAccount | undefined>(undefined)
-
-  useEffect(() => {
-    if (!publicKey || !ready) return
-
-    getUserProgramAddress(hashAuthorTag('synxe#6138'), program.programId)
-      .then(([key]) => program.account.user.fetchNullable(key))
-      .then((acc: ProgramAccount['account'] | null) => setUser(acc ?? undefined))
-      .catch(console.error)
-  }, [program, publicKey, ready])
+  const [discordTag, _setDiscordTag] = useState<string>('synxe#6138')
+  const user = useUser(discordTag)
 
   return (
     <>
       <Head>
         <title>Soloha ☕️</title>
-        <meta name="description" content="Make saying gm a little more meaningful" />
-        <link rel="icon" href="/favicon.ico" />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Nunito&display=swap"
-        />
       </Head>
       <Layout>
         <WalletModalProvider
-          logo={<img src="/anchor_logo.png" alt="anchor-logo" height="100%" />}
+          logo={<Image src="/anchor_logo.png" alt="anchor-logo" height="100%" width="100%" />}
           featuredWallets={5}
         >
           <Header />
@@ -51,9 +32,9 @@ const HomePage: NextPage = () => {
             Soloha! <CoffeeOutlined />
           </Typography.Title>
           <Typography.Title level={3} style={{ marginTop: 0, marginBottom: '2em' }}>
-            Make saying "gm" a little more meaningful.
+            Make saying &quot;gm&quot; a little more meaningful.
           </Typography.Title>
-          <Enrollment user={user} />
+          <Enrollment discordTag={discordTag} user={user} />
         </Content>
       </Layout>
     </>
