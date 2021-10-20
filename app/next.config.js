@@ -1,3 +1,4 @@
+const withLess = require('next-with-less')
 const withTM = require('next-transpile-modules')([
   '@solana/wallet-adapter-base',
   '@solana/wallet-adapter-react',
@@ -8,12 +9,23 @@ const withTM = require('next-transpile-modules')([
   '@solana/wallet-adapter-wallets'
 ])
 
-module.exports = withTM({
-  reactStrictMode: true,
-  webpack: (config, { isServer }) => {
-    if (!isServer) {
-      config.resolve.fallback.fs = false
+/** @type {import('next').NextConfig} */
+module.exports = withTM(
+  withLess({
+    lessLoaderOptions: {
+      lessOptions: {
+        modifyVars: {
+          'primary-color': 'rgb(111, 116, 201)'
+        }
+      }
+    },
+    reactStrictMode: true,
+    poweredByHeader: false,
+    webpack: (config, { isServer }) => {
+      if (!isServer) {
+        config.resolve.fallback.fs = false
+      }
+      return config
     }
-    return config
-  }
-})
+  })
+)
