@@ -1,7 +1,7 @@
 {
   "scripts": {
     "idl": "npm run idl:app && npm run idl:discord",
-    "idl:app": "cp target/idl/ahoy.json app/src/lib",
+    "idl:app": "cp target/idl/ahoy.json app/lib",
     "idl:discord": "cp target/idl/ahoy.json discord/src"
   },
   "dependencies": {

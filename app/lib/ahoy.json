@@ -143,10 +143,7 @@
           {
             "name": "bump",
             "type": {
-              "array": [
-                "u8",
-                1
-              ]
+              "array": ["u8", 1]
             }
           }
         ]
@@ -160,10 +157,7 @@
           {
             "name": "bump",
             "type": {
-              "array": [
-                "u8",
-                1
-              ]
+              "array": ["u8", 1]
             }
           },
           {
@@ -195,10 +189,7 @@
           {
             "name": "value",
             "type": {
-              "array": [
-                "u8",
-                8
-              ]
+              "array": ["u8", 8]
             }
           }
         ]

@@ -1,17 +1,19 @@
-import { CSSProperties, FunctionComponent, useEffect, useState } from 'react'
+import { CSSProperties, useEffect, useState } from 'react'
+import type { NextPage } from 'next'
+import Head from 'next/head'
 import { Layout, Typography } from 'antd'
-import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
-import { useWallet } from '@solana/wallet-adapter-react'
-import { ProgramAccount } from '@project-serum/anchor'
 import { CoffeeOutlined } from '@ant-design/icons'
-import Header from './components/Header'
-import Enrollment from './components/Enrollment'
-import { useAnchor } from './lib/anchor'
-import { getAnchoriteProgramAddress, hashAuthorTag } from './lib/util'
+import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
+import type { ProgramAccount } from '@project-serum/anchor'
+import { useWallet } from '@solana/wallet-adapter-react'
+import Header from '../components/Header'
+import Enrollment from '../components/Enrollment'
+import { useAnchor } from '../lib/anchor'
+import { getAnchoriteProgramAddress, hashAuthorTag } from '../lib/util'
 
 const { Content } = Layout
 
-const App: FunctionComponent = () => {
+const HomePage: NextPage = () => {
   const { publicKey, ready } = useWallet()
   const program = useAnchor()
 
@@ -22,16 +24,21 @@ const App: FunctionComponent = () => {
 
     getAnchoriteProgramAddress(hashAuthorTag('synxe#6138'), program.programId)
       .then(([key]) => program.account.anchorite.fetchNullable(key))
-      .then((acc: any | null) => {
-        if (acc) {
-          setAnchorite(acc)
-        }
-      })
+      .then((acc: ProgramAccount['account'] | null) => setAnchorite(acc ?? undefined))
       .catch(console.error)
   }, [program, publicKey, ready])
 
   return (
     <>
+      <Head>
+        <title>Ahoy ☕️</title>
+        <meta name="description" content="Make saying gm a little more meaningful" />
+        <link rel="icon" href="/favicon.ico" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Nunito&display=swap"
+        />
+      </Head>
       <Layout>
         <WalletModalProvider
           logo={<img src="/anchor_logo.png" alt="anchor-logo" height="100%" />}
@@ -61,4 +68,4 @@ const contentStyle: CSSProperties = {
   marginBottom: '10em'
 }
 
-export default App
+export default HomePage

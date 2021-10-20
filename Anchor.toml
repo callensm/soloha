@@ -1,7 +1,7 @@
 [programs.localnet]
 ahoy = "AHY7Dybe8eBiri3EAut4KPWtVNc7hoZHtbVNJh9EUmsm"
 
-[programs.testnet]
+[programs.devnet]
 ahoy = "AHY7Dybe8eBiri3EAut4KPWtVNc7hoZHtbVNJh9EUmsm"
 
 [registry]

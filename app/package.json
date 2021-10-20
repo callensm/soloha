@@ -3,12 +3,11 @@
   "private": true,
   "author": "Matthew Callens <callensmatt@gmail.com>",
   "scripts": {
-    "build": "npm run clean && craco build",
-    "clean": "rm -rf build/",
-    "lint": "eslint src/ && prettier src/ --check",
-    "fmt": "prettier src/ --write",
-    "serve": "serve -s build -p 3000",
-    "start": "craco start"
+    "build": "npm run clean && next build",
+    "clean": "rm -rf .next/",
+    "lint": "eslint src/ && prettier . --check",
+    "fmt": "prettier . --write",
+    "start": "next dev"
   },
   "dependencies": {
     "@ant-design/icons": "^4.7.0",
@@ -20,18 +19,16 @@
     "antd": "^4.16.13",
     "crc-32": "^1.2.0",
     "dayjs": "^1.10.7",
+    "next": "^11.1.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
   },
   "devDependencies": {
-    "@craco/craco": "^6.3.0",
     "@types/node": "^16.11.0",
     "@types/react": "^17.0.30",
     "@types/react-dom": "^17.0.9",
-    "craco-less": "^1.20.0",
+    "next-transpile-modules": "^8.0.0",
     "prettier": "^2.4.1",
-    "react-scripts": "^4.0.3",
-    "serve": "^12.0.1",
     "typescript": "^4.4.4"
   },
   "browserslist": {
