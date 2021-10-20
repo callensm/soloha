@@ -9,7 +9,7 @@ import { useWallet } from '@solana/wallet-adapter-react'
 import Header from '../components/Header'
 import Enrollment from '../components/Enrollment'
 import { useAnchor } from '../lib/anchor'
-import { getAnchoriteProgramAddress, hashAuthorTag } from '../lib/util'
+import { getUserProgramAddress, hashAuthorTag } from '../lib/util'
 
 const { Content } = Layout
 
@@ -17,14 +17,14 @@ const HomePage: NextPage = () => {
   const { publicKey, ready } = useWallet()
   const program = useAnchor()
 
-  const [anchorite, setAnchorite] = useState<ProgramAccount | undefined>(undefined)
+  const [user, setUser] = useState<ProgramAccount | undefined>(undefined)
 
   useEffect(() => {
     if (!publicKey || !ready) return
 
-    getAnchoriteProgramAddress(hashAuthorTag('synxe#6138'), program.programId)
-      .then(([key]) => program.account.anchorite.fetchNullable(key))
-      .then((acc: ProgramAccount['account'] | null) => setAnchorite(acc ?? undefined))
+    getUserProgramAddress(hashAuthorTag('synxe#6138'), program.programId)
+      .then(([key]) => program.account.user.fetchNullable(key))
+      .then((acc: ProgramAccount['account'] | null) => setUser(acc ?? undefined))
       .catch(console.error)
   }, [program, publicKey, ready])
 
@@ -53,7 +53,7 @@ const HomePage: NextPage = () => {
           <Typography.Title level={3} style={{ marginTop: 0, marginBottom: '2em' }}>
             Make saying "gm" a little more meaningful.
           </Typography.Title>
-          <Enrollment anchorite={anchorite} />
+          <Enrollment user={user} />
         </Content>
       </Layout>
     </>

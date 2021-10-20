@@ -42,7 +42,7 @@
           "isSigner": false
         },
         {
-          "name": "anchorite",
+          "name": "user",
           "isMut": true,
           "isSigner": false
         },
@@ -79,7 +79,7 @@
           "isSigner": false
         },
         {
-          "name": "anchorite",
+          "name": "user",
           "isMut": true,
           "isSigner": false
         }
@@ -107,7 +107,7 @@
           "isSigner": false
         },
         {
-          "name": "anchorite",
+          "name": "user",
           "isMut": true,
           "isSigner": false
         }
@@ -153,7 +153,7 @@
       }
     },
     {
-      "name": "Anchorite",
+      "name": "User",
       "type": {
         "kind": "struct",
         "fields": [
@@ -207,7 +207,17 @@
   ],
   "events": [
     {
-      "name": "ClosedAnchorite",
+      "name": "NewUser",
+      "fields": [
+        {
+          "name": "pubkey",
+          "type": "publicKey",
+          "index": true
+        }
+      ]
+    },
+    {
+      "name": "ClosedUser",
       "fields": [
         {
           "name": "pubkey",
@@ -218,16 +228,6 @@
           "name": "gms",
           "type": "u16",
           "index": false
-        }
-      ]
-    },
-    {
-      "name": "NewAnchorite",
-      "fields": [
-        {
-          "name": "pubkey",
-          "type": "publicKey",
-          "index": true
         }
       ]
     }

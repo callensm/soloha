@@ -19,11 +19,11 @@ export const getStateProgramAddress = (programId: web3.PublicKey) =>
   web3.PublicKey.findProgramAddress([Buffer.from('state')], programId)
 
 /**
- * Derives the public key and bump nonce for an `Anchorite` PDA
+ * Derives the public key and bump nonce for an `User` PDA
  * using the provided Discord user tag CRC-32 hash value.
  * @param {Buffer} tagHash
  * @param {web3.PublicKey} programId
  * @returns {Promise<[web3.PublicKey, number]>}
  */
-export const getAnchoriteProgramAddress = (tagHash: Buffer, programId: web3.PublicKey) =>
-  web3.PublicKey.findProgramAddress([Buffer.from('anchorite'), tagHash], programId)
+export const getUserProgramAddress = (tagHash: Buffer, programId: web3.PublicKey) =>
+  web3.PublicKey.findProgramAddress([Buffer.from('user'), tagHash], programId)

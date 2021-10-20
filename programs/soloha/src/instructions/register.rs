@@ -14,6 +14,7 @@
 
 use anchor_lang::prelude::*;
 
+use crate::event::NewUser;
 use crate::{seeds, State, TagHash};
 
 #[derive(Accounts)]
@@ -35,19 +36,19 @@ pub struct Register<'info> {
         init,
         payer = owner,
         seeds = [
-            seeds::ANCHORITE,
+            seeds::USER,
             tag.value.as_ref()
         ],
         bump = bump,
         space = 8 + 1 + 8 + 32 + 2 + 2,
     )]
-    pub anchorite: Box<Account<'info, Anchorite>>,
+    pub user: Box<Account<'info, User>>,
 
     pub system_program: Program<'info, System>,
 }
 
 #[account]
-pub struct Anchorite {
+pub struct User {
     pub bump: [u8; 1],
     pub last_gm: u64,
     pub owner: Pubkey,
@@ -55,24 +56,16 @@ pub struct Anchorite {
     pub total: u16,
 }
 
-#[event]
-pub struct NewAnchorite {
-    #[index]
-    pub pubkey: Pubkey,
-}
-
 pub fn handler(ctx: Context<Register>, _tag: TagHash, bump: u8) -> ProgramResult {
-    let anchorite = &mut ctx.accounts.anchorite;
-    anchorite.owner = ctx.accounts.owner.key();
-    anchorite.last_gm = u64::default();
-    anchorite.bump = [bump];
+    let user = &mut ctx.accounts.user;
+    user.owner = ctx.accounts.owner.key();
+    user.last_gm = u64::default();
+    user.bump = [bump];
 
     let state = &mut ctx.accounts.state;
     state.registered = state.registered.checked_add(1).unwrap();
 
-    emit!(NewAnchorite {
-        pubkey: anchorite.key()
-    });
+    emit!(NewUser { pubkey: user.key() });
 
     Ok(())
 }

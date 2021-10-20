@@ -1,12 +1,18 @@
 use anchor_lang::prelude::*;
 
-use crate::{seeds, Anchorite, ErrorCode, State, TagHash};
+use crate::error::ErrorCode;
+use crate::{seeds, State, TagHash, User};
 
+/// Constant definition for the number of seconds
+/// in a day to use for the time comparison between gms.
 const ONE_DAY: u64 = 86_400;
 
 #[derive(Accounts)]
 #[instruction(tag: TagHash)]
 pub struct GM<'info> {
+    /// This authority account will likely always be the
+    /// keypair for a Discord bot connected to the originating
+    /// server that is watching for gm messages.
     pub authority: Signer<'info>,
 
     #[account(
@@ -21,35 +27,35 @@ pub struct GM<'info> {
     #[account(
         mut,
         seeds = [
-            seeds::ANCHORITE,
+            seeds::USER,
             tag.value.as_ref()
         ],
-        bump = anchorite.bump[0],
-        constraint = anchorite.owner != authority.key(),
+        bump = user.bump[0],
+        constraint = user.owner != authority.key(),
     )]
-    pub anchorite: Box<Account<'info, Anchorite>>,
+    pub user: Box<Account<'info, User>>,
 }
 
 pub fn handler(ctx: Context<GM>, _tag: TagHash) -> ProgramResult {
-    let anchorite = &mut ctx.accounts.anchorite;
+    let user = &mut ctx.accounts.user;
     let state = &mut ctx.accounts.state;
 
     let current_time = Clock::get()?.unix_timestamp as u64;
-    let elapsed_since: u64 = current_time.checked_sub(anchorite.last_gm).unwrap();
+    let elapsed_since: u64 = current_time.checked_sub(user.last_gm).unwrap();
 
     if elapsed_since <= ONE_DAY {
         return Err(ErrorCode::MultipleAttemptsInOneDay.into());
     } else if elapsed_since > ONE_DAY * 2 {
-        anchorite.streak = 0;
+        user.streak = 0;
     }
 
-    anchorite.last_gm = current_time;
-    anchorite.streak = anchorite.streak.checked_add(1).unwrap();
-    anchorite.total = anchorite.total.checked_add(1).unwrap();
+    user.last_gm = current_time;
+    user.streak = user.streak.checked_add(1).unwrap();
+    user.total = user.total.checked_add(1).unwrap();
 
-    if anchorite.streak > state.highest_streak {
-        state.highest_streak = anchorite.streak;
-        state.highest_streak_owner = anchorite.owner;
+    if user.streak > state.highest_streak {
+        state.highest_streak = user.streak;
+        state.highest_streak_owner = user.owner;
     }
 
     Ok(())

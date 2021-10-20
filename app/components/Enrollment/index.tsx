@@ -5,10 +5,10 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import dayjs from 'dayjs'
 import Coffee from './Coffee'
 import { useAnchor } from '../../lib/anchor'
-import { getAnchoriteProgramAddress, getStateProgramAddress, hashAuthorTag } from '../../lib/util'
+import { getUserProgramAddress, getStateProgramAddress, hashAuthorTag } from '../../lib/util'
 
 interface EnrollmentProps {
-  anchorite?: ProgramAccount
+  user?: ProgramAccount
 }
 
 const Enrollment: FunctionComponent<EnrollmentProps> = props => {
@@ -25,11 +25,11 @@ const Enrollment: FunctionComponent<EnrollmentProps> = props => {
       .then(([stateKey]) => program.account.state.fetch(stateKey))
       .then((state: any) => setRegisteredCount((state.registered as BN).toNumber()))
       .then(() => {
-        const inc = program.addEventListener('NewAnchorite', _e =>
+        const inc = program.addEventListener('NewUser', _e =>
           setRegisteredCount(count => count + 1)
         )
 
-        const dec = program.addEventListener('ClosedAnchorite', _e =>
+        const dec = program.addEventListener('ClosedUser', _e =>
           setRegisteredCount(count => count - 1)
         )
 
@@ -60,28 +60,25 @@ const Enrollment: FunctionComponent<EnrollmentProps> = props => {
     const [stateKey] = await getStateProgramAddress(program.programId)
 
     const tagHash = { value: hashAuthorTag('synxe#6138') }
-    const [anchoriteKey, anchoriteBump] = await getAnchoriteProgramAddress(
-      tagHash.value,
-      program.programId
-    )
+    const [userKey, userBump] = await getUserProgramAddress(tagHash.value, program.programId)
 
     let tx: web3.Transaction
 
     try {
-      if (props.anchorite) {
+      if (props.user) {
         tx = program.transaction.deregister(tagHash, {
           accounts: {
             owner: publicKey,
             state: stateKey,
-            anchorite: anchoriteKey
+            user: userKey
           }
         } as Context)
       } else {
-        tx = program.transaction.register(tagHash, anchoriteBump, {
+        tx = program.transaction.register(tagHash, userBump, {
           accounts: {
             owner: publicKey,
             state: stateKey,
-            anchorite: anchoriteKey,
+            user: userKey,
             systemProgram: web3.SystemProgram.programId
           }
         } as Context)
@@ -110,7 +107,7 @@ const Enrollment: FunctionComponent<EnrollmentProps> = props => {
     } finally {
       setLoading(false)
     }
-  }, [props.anchorite, program, publicKey, sendTransaction])
+  }, [props.user, program, publicKey, sendTransaction])
 
   return (
     <Spin spinning={loading}>
@@ -122,7 +119,7 @@ const Enrollment: FunctionComponent<EnrollmentProps> = props => {
         }}
       >
         <Comment
-          author="Captain"
+          author="Espresso"
           avatar={<Avatar src="/anchor_logo.png" size="large" shape="circle" />}
           content="gm - react to my message to register or deregister"
           datetime={`Today at ${dayjs().format('h:mm A')}`}
@@ -130,7 +127,7 @@ const Enrollment: FunctionComponent<EnrollmentProps> = props => {
             <Coffee
               count={registeredCount}
               enabled={publicKey !== null && ready}
-              isRegistered={props.anchorite !== undefined}
+              isRegistered={props.user !== undefined}
               onClick={handleCoffeeClick}
             />
           ]}

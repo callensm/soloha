@@ -3,7 +3,7 @@ import crc32 from 'crc-32'
 
 /**
  * Create a `Buffer` from a CRC-32 hash to be used as an
- * Anchorite account seed for creation and validation.
+ * `User` account seed for creation and validation.
  * @exports
  * @param {string} tag
  * @returns {Buffer}
@@ -12,13 +12,13 @@ export const hashAuthorTag = (tag: string): Buffer => Buffer.from(crc32.str(tag)
 
 /**
  * Attempt to derive the public key and bump nonce for a
- * Discord user's Anchorite account on chain.
+ * Discord user's `User` account on chain.
  * @param {web3.PublicKey} programId
  * @param {Buffer} tagHash
  * @returns {Promise<[web3.PublicKey, number]>}
  */
-export const getAnchoriteAddressAndBump = (
+export const getUserAddressAndBump = (
   programId: web3.PublicKey,
   tagHash: Buffer
 ): Promise<[web3.PublicKey, number]> =>
-  web3.PublicKey.findProgramAddress([Buffer.from('anchorite'), tagHash], programId)
+  web3.PublicKey.findProgramAddress([Buffer.from('user'), tagHash], programId)

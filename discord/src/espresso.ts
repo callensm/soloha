@@ -1,9 +1,9 @@
 import { readFileSync } from 'fs'
 import { Client, Intents, Message } from 'discord.js'
 import { web3, Program, Provider, Wallet, Context } from '@project-serum/anchor'
-import { getAnchoriteAddressAndBump, hashAuthorTag } from './util'
+import { getUserAddressAndBump, hashAuthorTag } from './util'
 
-export type CaptainParameters = {
+export type EspressoParameters = {
   acceptedGms: string[]
   channelId: string
   clusterEndpoint: string
@@ -11,13 +11,13 @@ export type CaptainParameters = {
   keypairPath: string
 }
 
-export default class Captain {
+export default class Espresso {
   private client: Client
   private keypair: web3.Keypair
   private program?: Program
   private statePublicKey: web3.PublicKey
 
-  constructor(public readonly version: string, private readonly params: CaptainParameters) {
+  constructor(public readonly version: string, private readonly params: EspressoParameters) {
     this.client = new Client({
       intents: [
         Intents.FLAGS.GUILDS,
@@ -76,8 +76,8 @@ export default class Captain {
       console.log(`GM from ${msg.author.tag}`)
 
       const tagHash: Buffer = hashAuthorTag(msg.author.tag)
-      const [pubkey, _bump] = await getAnchoriteAddressAndBump(this.program!.programId, tagHash)
-      const listener = this.program!.account.anchorite.subscribe(pubkey, 'confirmed')
+      const [pubkey, _bump] = await getUserAddressAndBump(this.program!.programId, tagHash)
+      const listener = this.program!.account.user.subscribe(pubkey, 'confirmed')
 
       try {
         listener.once('change', async (data: any) => {
@@ -90,7 +90,7 @@ export default class Captain {
           accounts: {
             authority: this.keypair.publicKey,
             state: this.statePublicKey,
-            anchorite: pubkey
+            user: pubkey
           }
         } as Context)
 
@@ -107,7 +107,7 @@ export default class Captain {
         await msg.delete()
       } finally {
         listener.removeAllListeners()
-        await this.program!.account.anchorite.unsubscribe(pubkey)
+        await this.program!.account.user.unsubscribe(pubkey)
       }
     }
   }

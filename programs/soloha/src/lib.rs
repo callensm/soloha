@@ -14,6 +14,8 @@
 
 use anchor_lang::prelude::*;
 
+mod error;
+mod event;
 mod instructions;
 
 use instructions::*;
@@ -21,8 +23,8 @@ use instructions::*;
 declare_id!("LHAPYTbqXFzkNxojt16Mx5gtAnnbhkZfMyLvU9xsKVe");
 
 mod seeds {
-    pub const ANCHORITE: &[u8] = b"anchorite";
     pub const STATE: &[u8] = b"state";
+    pub const USER: &[u8] = b"user";
 }
 
 #[program]
@@ -49,10 +51,4 @@ pub mod soloha {
 #[derive(AnchorDeserialize, AnchorSerialize)]
 pub struct TagHash {
     pub value: [u8; 8],
-}
-
-#[error]
-pub enum ErrorCode {
-    #[msg("user has gm'ed more than once in a single day")]
-    MultipleAttemptsInOneDay,
 }

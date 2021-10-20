@@ -16,8 +16,8 @@ describe('soloha', () => {
   const authority = (program.provider.wallet as NodeWallet).payer
   const owner = anchor.web3.Keypair.generate()
 
-  let anchoriteKey: anchor.web3.PublicKey
-  let anchoriteBump: number
+  let userKey: anchor.web3.PublicKey
+  let userBump: number
 
   let stateKey: anchor.web3.PublicKey
   let stateBump: number
@@ -54,40 +54,40 @@ describe('soloha', () => {
   })
 
   describe('register instruction', () => {
-    let testAnchorite: anchor.ProgramAccount<any>
+    let testUser: anchor.ProgramAccount<any>
 
     before(async () => {
-      ;[anchoriteKey, anchoriteBump] = await anchor.web3.PublicKey.findProgramAddress(
-        [Buffer.from('anchorite'), Buffer.from(tagHash)],
+      ;[userKey, userBump] = await anchor.web3.PublicKey.findProgramAddress(
+        [Buffer.from('user'), Buffer.from(tagHash)],
         program.programId
       )
 
-      await program.rpc.register({ value: tagHash }, anchoriteBump, {
+      await program.rpc.register({ value: tagHash }, userBump, {
         accounts: {
           owner: owner.publicKey,
           state: stateKey,
-          anchorite: anchoriteKey,
+          user: userKey,
           systemProgram: anchor.web3.SystemProgram.programId
         },
         signers: [owner]
       } as anchor.Context)
     })
 
-    it('creates a new anchorite account for the user', async () => {
-      const anchorites = await program.account.anchorite.all()
-      assert.lengthOf(anchorites, 1)
+    it('creates a new user account for the user', async () => {
+      const users = await program.account.user.all()
+      assert.lengthOf(users, 1)
 
-      testAnchorite = anchorites[0]
-      assert.isTrue(testAnchorite.publicKey.equals(anchoriteKey))
-      assert.strictEqual(testAnchorite.account.bump[0], anchoriteBump)
+      testUser = users[0]
+      assert.isTrue(testUser.publicKey.equals(userKey))
+      assert.strictEqual(testUser.account.bump[0], userBump)
     })
 
     it('sets the owner pubkey in data', () => {
-      assert.isTrue((testAnchorite.account.owner as anchor.web3.PublicKey).equals(owner.publicKey))
+      assert.isTrue((testUser.account.owner as anchor.web3.PublicKey).equals(owner.publicKey))
     })
 
     it('zeroes the timestamp of the last gm by default', () => {
-      assert.strictEqual((testAnchorite.account.lastGm as anchor.BN).toNumber(), 0)
+      assert.strictEqual((testUser.account.lastGm as anchor.BN).toNumber(), 0)
     })
 
     it('adds one to global registered counter', async () => {
@@ -97,27 +97,27 @@ describe('soloha', () => {
   })
 
   describe('gm instruction', () => {
-    let anchoriteData: any
+    let userData: any
 
     before(async () => {
       await program.rpc.gm({ value: tagHash }, {
         accounts: {
           authority: authority.publicKey,
           state: stateKey,
-          anchorite: anchoriteKey
+          user: userKey
         },
         signers: [authority]
       } as anchor.Context)
 
-      anchoriteData = await program.account.anchorite.fetch(anchoriteKey)
+      userData = await program.account.user.fetch(userKey)
     })
 
     it('updates the streak count', () => {
-      assert.strictEqual(anchoriteData.streak as number, 1)
+      assert.strictEqual(userData.streak as number, 1)
     })
 
     it('updates the last gm timestamp', () => {
-      assert.isTrue(anchoriteData.lastGm > 0)
+      assert.isTrue(userData.lastGm > 0)
     })
 
     it('fails when done more than once per day', () => {
@@ -125,7 +125,7 @@ describe('soloha', () => {
         program.rpc.gm({ value: tagHash }, {
           accounts: {
             authority: authority.publicKey,
-            anchorite: anchoriteKey
+            user: userKey
           },
           signers: [authority]
         } as anchor.Context)
@@ -145,15 +145,15 @@ describe('soloha', () => {
         accounts: {
           owner: owner.publicKey,
           state: stateKey,
-          anchorite: anchoriteKey
+          user: userKey
         },
         signers: [owner]
       } as anchor.Context)
     })
 
-    it('closes the anchorite account passed', async () => {
-      const anchorites = await program.account.anchorite.all()
-      assert.isEmpty(anchorites)
+    it('closes the user account passed', async () => {
+      const users = await program.account.user.all()
+      assert.isEmpty(users)
     })
 
     it('updates global state to decrement registered count', async () => {
