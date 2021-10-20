@@ -1,1 +1,1 @@
-# @ahoy/captain
+# @soloha/captain

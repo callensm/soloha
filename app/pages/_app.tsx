@@ -13,7 +13,7 @@ const DynamicWalletConnectionProvider = dynamic(
   }
 )
 
-const AhoyApp: FunctionComponent<AppProps> = ({ Component, pageProps }) => {
+const SolohaApp: FunctionComponent<AppProps> = ({ Component, pageProps }) => {
   return (
     <DynamicWalletConnectionProvider>
       <Component {...pageProps} />
@@ -21,4 +21,4 @@ const AhoyApp: FunctionComponent<AppProps> = ({ Component, pageProps }) => {
   )
 }
 
-export default AhoyApp
+export default SolohaApp

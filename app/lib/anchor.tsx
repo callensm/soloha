@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useConnection, useAnchorWallet } from '@solana/wallet-adapter-react'
 import { Program, Provider, Wallet } from '@project-serum/anchor'
-import idl from './ahoy.json'
+import idl from './soloha.json'
 
 export const useAnchor = () => {
   const { connection } = useConnection()

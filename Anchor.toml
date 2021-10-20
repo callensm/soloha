@@ -1,8 +1,8 @@
 [programs.localnet]
-ahoy = "AHY7Dybe8eBiri3EAut4KPWtVNc7hoZHtbVNJh9EUmsm"
+soloha = "LHAPYTbqXFzkNxojt16Mx5gtAnnbhkZfMyLvU9xsKVe"
 
 [programs.devnet]
-ahoy = "AHY7Dybe8eBiri3EAut4KPWtVNc7hoZHtbVNJh9EUmsm"
+soloha = "LHAPYTbqXFzkNxojt16Mx5gtAnnbhkZfMyLvU9xsKVe"
 
 [registry]
 url = "https://anchor.projectserum.com"

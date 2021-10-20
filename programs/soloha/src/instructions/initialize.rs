@@ -16,13 +16,13 @@ pub struct InitializeState<'info> {
         bump = bump,
         space = 8 + 2 + 32 + 8 + 1,
     )]
-    pub state: Box<Account<'info, AhoyState>>,
+    pub state: Box<Account<'info, State>>,
 
     pub system_program: Program<'info, System>,
 }
 
 #[account]
-pub struct AhoyState {
+pub struct State {
     pub highest_streak: u16,
     pub highest_streak_owner: Pubkey,
     pub registered: u64,

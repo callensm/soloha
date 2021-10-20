@@ -9,10 +9,10 @@ chaiUse(chaiAsPromised)
 const discordTag = '@synxe#6138'
 const tagHash = Buffer.from(crc32.str(discordTag).toString(16))
 
-describe('ahoy', () => {
+describe('soloha', () => {
   anchor.setProvider(anchor.Provider.env())
 
-  const program: anchor.Program = anchor.workspace.Ahoy
+  const program: anchor.Program = anchor.workspace.Soloha
   const authority = (program.provider.wallet as NodeWallet).payer
   const owner = anchor.web3.Keypair.generate()
 
@@ -48,7 +48,7 @@ describe('ahoy', () => {
     })
 
     it('creates the global state pda', async () => {
-      const state = await program.account.ahoyState.all()
+      const state = await program.account.state.all()
       assert.lengthOf(state, 1)
     })
   })
@@ -91,7 +91,7 @@ describe('ahoy', () => {
     })
 
     it('adds one to global registered counter', async () => {
-      const state = await program.account.ahoyState.fetch(stateKey)
+      const state = await program.account.state.fetch(stateKey)
       assert.strictEqual((state.registered as anchor.BN).toNumber(), 1)
     })
   })
@@ -133,7 +133,7 @@ describe('ahoy', () => {
     })
 
     it('updates the global state streak number and owner', async () => {
-      const state = await program.account.ahoyState.fetch(stateKey)
+      const state = await program.account.state.fetch(stateKey)
       assert.strictEqual(state.highestStreak, 1)
       assert.isTrue((state.highestStreakOwner as anchor.web3.PublicKey).equals(owner.publicKey))
     })
@@ -157,7 +157,7 @@ describe('ahoy', () => {
     })
 
     it('updates global state to decrement registered count', async () => {
-      const state = await program.account.ahoyState.fetch(stateKey)
+      const state = await program.account.state.fetch(stateKey)
       assert.strictEqual((state.registered as anchor.BN).toNumber(), 0)
     })
   })

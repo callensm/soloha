@@ -1,6 +1,6 @@
 {
   "version": "0.0.0",
-  "name": "ahoy",
+  "name": "soloha",
   "instructions": [
     {
       "name": "initialize",
@@ -124,7 +124,7 @@
   ],
   "accounts": [
     {
-      "name": "AhoyState",
+      "name": "State",
       "type": {
         "kind": "struct",
         "fields": [
@@ -143,7 +143,10 @@
           {
             "name": "bump",
             "type": {
-              "array": ["u8", 1]
+              "array": [
+                "u8",
+                1
+              ]
             }
           }
         ]
@@ -157,7 +160,10 @@
           {
             "name": "bump",
             "type": {
-              "array": ["u8", 1]
+              "array": [
+                "u8",
+                1
+              ]
             }
           },
           {
@@ -189,7 +195,10 @@
           {
             "name": "value",
             "type": {
-              "array": ["u8", 8]
+              "array": [
+                "u8",
+                8
+              ]
             }
           }
         ]
@@ -231,6 +240,6 @@
     }
   ],
   "metadata": {
-    "address": "AHY7Dybe8eBiri3EAut4KPWtVNc7hoZHtbVNJh9EUmsm"
+    "address": "LHAPYTbqXFzkNxojt16Mx5gtAnnbhkZfMyLvU9xsKVe"
   }
 }

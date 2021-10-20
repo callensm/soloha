@@ -1,8 +1,10 @@
 {
+  "name": "soloha",
+  "private": true,
   "scripts": {
     "idl": "npm run idl:app && npm run idl:discord",
-    "idl:app": "cp target/idl/ahoy.json app/lib",
-    "idl:discord": "cp target/idl/ahoy.json discord/src"
+    "idl:app": "cp target/idl/soloha.json app/lib",
+    "idl:discord": "cp target/idl/soloha.json discord/src"
   },
   "dependencies": {
     "@project-serum/anchor": "^0.17.0",

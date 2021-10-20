@@ -31,7 +31,7 @@ const HomePage: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Ahoy ☕️</title>
+        <title>Soloha ☕️</title>
         <meta name="description" content="Make saying gm a little more meaningful" />
         <link rel="icon" href="/favicon.ico" />
         <link
@@ -48,7 +48,7 @@ const HomePage: NextPage = () => {
         </WalletModalProvider>
         <Content style={contentStyle}>
           <Typography.Title>
-            Ahoy! <CoffeeOutlined />
+            Soloha! <CoffeeOutlined />
           </Typography.Title>
           <Typography.Title level={3} style={{ marginTop: 0, marginBottom: '2em' }}>
             Make saying "gm" a little more meaningful.

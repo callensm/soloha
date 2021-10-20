@@ -22,7 +22,7 @@ const Enrollment: FunctionComponent<EnrollmentProps> = props => {
 
   useEffect(() => {
     getStateProgramAddress(program.programId)
-      .then(([stateKey]) => program.account.ahoyState.fetch(stateKey))
+      .then(([stateKey]) => program.account.state.fetch(stateKey))
       .then((state: any) => setRegisteredCount((state.registered as BN).toNumber()))
       .then(() => {
         const inc = program.addEventListener('NewAnchorite', _e =>
@@ -37,7 +37,7 @@ const Enrollment: FunctionComponent<EnrollmentProps> = props => {
       })
       .catch(err => {
         notification.error({
-          message: 'Ahoy State Fetch Error',
+          message: 'State Fetch Error',
           description: (err as Error).message,
           placement: 'bottomLeft',
           duration: 20

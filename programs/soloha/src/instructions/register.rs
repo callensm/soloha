@@ -14,11 +14,11 @@
 
 use anchor_lang::prelude::*;
 
-use crate::{seeds, AhoyState, Anchorite, TagHash};
+use crate::{seeds, State, TagHash};
 
 #[derive(Accounts)]
-#[instruction(tag: TagHash)]
-pub struct Deregister<'info> {
+#[instruction(tag: TagHash, bump: u8)]
+pub struct Register<'info> {
     #[account(mut)]
     pub owner: Signer<'info>,
 
@@ -29,35 +29,49 @@ pub struct Deregister<'info> {
         ],
         bump = state.bump[0],
     )]
-    pub state: Box<Account<'info, AhoyState>>,
+    pub state: Box<Account<'info, State>>,
 
     #[account(
-        mut,
+        init,
+        payer = owner,
         seeds = [
             seeds::ANCHORITE,
             tag.value.as_ref()
         ],
-        bump = anchorite.bump[0],
-        has_one = owner,
-        close = owner,
+        bump = bump,
+        space = 8 + 1 + 8 + 32 + 2 + 2,
     )]
-    pub anchorite: Account<'info, Anchorite>,
+    pub anchorite: Box<Account<'info, Anchorite>>,
+
+    pub system_program: Program<'info, System>,
+}
+
+#[account]
+pub struct Anchorite {
+    pub bump: [u8; 1],
+    pub last_gm: u64,
+    pub owner: Pubkey,
+    pub streak: u16,
+    pub total: u16,
 }
 
 #[event]
-pub struct ClosedAnchorite {
+pub struct NewAnchorite {
     #[index]
     pub pubkey: Pubkey,
-    pub gms: u16,
 }
 
-pub fn handler(ctx: Context<Deregister>, _tag: TagHash) -> ProgramResult {
-    let state = &mut ctx.accounts.state;
-    state.registered = state.registered.checked_sub(1).unwrap();
+pub fn handler(ctx: Context<Register>, _tag: TagHash, bump: u8) -> ProgramResult {
+    let anchorite = &mut ctx.accounts.anchorite;
+    anchorite.owner = ctx.accounts.owner.key();
+    anchorite.last_gm = u64::default();
+    anchorite.bump = [bump];
 
-    emit!(ClosedAnchorite {
-        pubkey: ctx.accounts.anchorite.key(),
-        gms: ctx.accounts.anchorite.total,
+    let state = &mut ctx.accounts.state;
+    state.registered = state.registered.checked_add(1).unwrap();
+
+    emit!(NewAnchorite {
+        pubkey: anchorite.key()
     });
 
     Ok(())

@@ -4,7 +4,7 @@ import { NodeWallet } from '@project-serum/anchor/src/provider'
 module.exports = async function (provider: anchor.Provider) {
   anchor.setProvider(provider)
 
-  const program: anchor.Program = anchor.workspace.Ahoy
+  const program: anchor.Program = anchor.workspace.Soloha
   const authority = (provider.wallet as NodeWallet).payer
 
   const [stateKey, stateBump] = await anchor.web3.PublicKey.findProgramAddress(

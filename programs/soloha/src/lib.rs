@@ -18,7 +18,7 @@ mod instructions;
 
 use instructions::*;
 
-declare_id!("AHY7Dybe8eBiri3EAut4KPWtVNc7hoZHtbVNJh9EUmsm");
+declare_id!("LHAPYTbqXFzkNxojt16Mx5gtAnnbhkZfMyLvU9xsKVe");
 
 mod seeds {
     pub const ANCHORITE: &[u8] = b"anchorite";
@@ -26,7 +26,7 @@ mod seeds {
 }
 
 #[program]
-pub mod ahoy {
+pub mod soloha {
     use super::*;
 
     pub fn initialize(ctx: Context<InitializeState>, bump: u8) -> ProgramResult {

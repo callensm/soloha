@@ -1,6 +1,6 @@
 {
   "version": "0.0.0",
-  "name": "ahoy",
+  "name": "soloha",
   "instructions": [
     {
       "name": "initialize",
@@ -124,7 +124,7 @@
   ],
   "accounts": [
     {
-      "name": "AhoyState",
+      "name": "State",
       "type": {
         "kind": "struct",
         "fields": [
@@ -240,6 +240,6 @@
     }
   ],
   "metadata": {
-    "address": "AHY7Dybe8eBiri3EAut4KPWtVNc7hoZHtbVNJh9EUmsm"
+    "address": "LHAPYTbqXFzkNxojt16Mx5gtAnnbhkZfMyLvU9xsKVe"
   }
 }

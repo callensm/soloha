@@ -1,13 +1,13 @@
 {
-  "name": "@ahoy/captain",
+  "name": "@soloha/captain",
   "version": "0.1.0",
-  "description": "Discord bot for the Ahoy Solana program",
+  "description": "Discord bot for the Soloha program",
   "main": "./build/index.js",
   "author": "Matthew Callens <callensmatt@gmail.com>",
   "license": "../LICENSE",
   "keywords": [
     "solana",
-    "ahoy",
+    "soloha",
     "captain",
     "discord",
     "anchor",
@@ -15,12 +15,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/callensm/ahoy.git#master"
+    "url": "git+https://github.com/callensm/soloha.git#master"
   },
   "bugs": {
-    "url": "https://github.com/callensm/ahoy/issues"
+    "url": "https://github.com/callensm/soloha/issues"
   },
-  "homepage": "https://github.com/callensm/ahoy/tree/master#readme",
+  "homepage": "https://github.com/callensm/soloha/tree/master#readme",
   "scripts": {
     "build": "tsc"
   },

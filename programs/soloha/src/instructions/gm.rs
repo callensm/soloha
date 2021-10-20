@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::{seeds, AhoyState, Anchorite, ErrorCode, TagHash};
+use crate::{seeds, Anchorite, ErrorCode, State, TagHash};
 
 const ONE_DAY: u64 = 86_400;
 
@@ -16,7 +16,7 @@ pub struct GM<'info> {
         ],
         bump = state.bump[0],
     )]
-    pub state: Box<Account<'info, AhoyState>>,
+    pub state: Box<Account<'info, State>>,
 
     #[account(
         mut,
