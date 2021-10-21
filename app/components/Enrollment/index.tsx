@@ -1,4 +1,4 @@
-import { CSSProperties, FunctionComponent, useCallback, useEffect, useState } from 'react'
+import { CSSProperties, FunctionComponent, useCallback, useState } from 'react'
 import { Avatar, Comment, notification, Spin } from 'antd'
 import { web3, Context, ProgramAccount } from '@project-serum/anchor'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
@@ -8,7 +8,7 @@ import { useAnchor, useGlobalState } from '../../lib/hooks'
 import { getUserProgramAddress, getStateProgramAddress, hashDiscordTag } from '../../lib/util'
 
 interface EnrollmentProps {
-  discordTag: string
+  discordTag?: string
   user: ProgramAccount | null
 }
 
@@ -19,25 +19,12 @@ const Enrollment: FunctionComponent<EnrollmentProps> = props => {
   const { connection } = useConnection()
 
   const [loading, setLoading] = useState<boolean>(false)
-  const [listeners, setListeners] = useState<[number, number]>([-1, -1])
-  const [registeredCount, setRegisteredCount] = useState<number>(
+  const [registeredCount, _setRegisteredCount] = useState<number>(
     state?.account.registered.toNumber() || 0
   )
 
-  useEffect(() => {
-    const inc = program.addEventListener('NewUser', _e => setRegisteredCount(count => count + 1))
-    const dec = program.addEventListener('ClosedUser', _e => setRegisteredCount(count => count - 1))
-    setListeners([inc, dec])
-
-    return () => {
-      if (listeners.every(l => l === -1)) return
-      if (listeners[0] !== -1) program.removeEventListener(listeners[0]).catch(console.error)
-      if (listeners[1] !== -1) program.removeEventListener(listeners[1]).catch(console.error)
-    }
-  }, [program, listeners])
-
   const handleCoffeeClick = useCallback(async () => {
-    if (!publicKey || props.discordTag === '') return
+    if (!publicKey || !props.discordTag) return
 
     setLoading(true)
 

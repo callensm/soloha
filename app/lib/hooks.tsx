@@ -39,17 +39,17 @@ export const useAnchor = (): Program<any> => {
  * Custom React hook to provide the possible state
  * of the authenticated discord user's on-chain
  * `User` PDA account.
- * @param {string} tag
+ * @param {string | undefined} tag
  * @returns {ProgramAccount<User> | null}
  */
-export const useUser = (tag: string): ProgramAccount<User> | null => {
+export const useUser = (tag?: string): ProgramAccount<User> | null => {
   const program = useAnchor()
 
   const [userKey, setUserKey] = useState<web3.PublicKey | null>(null)
   const [user, setUser] = useState<ProgramAccount<User> | null>(null)
 
   useEffect(() => {
-    if (tag === '') return
+    if (!tag) return
 
     getUserProgramAddress(hashDiscordTag(tag), program.programId)
       .then(([key]: [web3.PublicKey, number]) => setUserKey(key))

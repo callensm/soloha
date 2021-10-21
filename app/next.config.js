@@ -26,6 +26,9 @@ module.exports = withTM(
         config.resolve.fallback.fs = false
       }
       return config
+    },
+    images: {
+      domains: ['cdn.discordapp.com']
     }
   })
 )

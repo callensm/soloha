@@ -1,13 +1,17 @@
 import { CSSProperties, FunctionComponent } from 'react'
-import { Layout } from 'antd'
+import { Layout, Space } from 'antd'
 import ConnectButton from './ConnectButton'
+import DiscordAuthentication from './DiscordAuthentication'
 
 interface HeaderProps {}
 
 const Header: FunctionComponent<HeaderProps> = _props => {
   return (
     <Layout.Header style={headerStyle}>
-      <ConnectButton />
+      <Space size="large">
+        <DiscordAuthentication />
+        <ConnectButton />
+      </Space>
     </Layout.Header>
   )
 }
