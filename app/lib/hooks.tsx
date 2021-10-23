@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { notification } from 'antd'
 import { useConnection, useAnchorWallet } from '@solana/wallet-adapter-react'
 import { BN, Program, ProgramAccount, Provider, Wallet, web3 } from '@project-serum/anchor'
+import { IDL, Soloha } from './soloha'
 import { getStateProgramAddress, getUserProgramAddress, hashDiscordTag } from './util'
-import idl from './soloha.json'
 
 type GlobalState = {
   highestStreak: number
@@ -23,15 +23,15 @@ type User = {
 /**
  * Custom React hook to provide the Anchor program
  * instance to any component.
- * @returns {Program<any>}
+ * @returns {Program<Soloha>}
  */
-export const useAnchor = (): Program<any> => {
+export const useAnchor = (): Program<Soloha> => {
   const { connection } = useConnection()
   const wallet = useAnchorWallet()
 
   return useMemo(() => {
     const provider = new Provider(connection, wallet as Wallet, {})
-    return new Program(idl as any, (idl as any).metadata.address, provider)
+    return new Program(IDL, new web3.PublicKey(process.env.NEXT_PUBLIC_PROGRAM_ID!), provider)
   }, [connection, wallet])
 }
 

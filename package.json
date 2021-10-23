@@ -3,11 +3,11 @@
   "private": true,
   "scripts": {
     "idl": "npm run idl:app && npm run idl:discord",
-    "idl:app": "cp target/idl/soloha.json app/lib",
-    "idl:discord": "cp target/idl/soloha.json discord/src"
+    "idl:app": "cp target/types/soloha.ts app/lib",
+    "idl:discord": "cp target/types/soloha.ts discord/src"
   },
   "dependencies": {
-    "@project-serum/anchor": "^0.17.0",
+    "@project-serum/anchor": "^0.17.1-beta.2",
     "crc-32": "^1.2.0"
   },
   "devDependencies": {

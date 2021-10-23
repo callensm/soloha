@@ -1,20 +1,20 @@
 import { readFileSync } from 'fs'
 import { Client, Intents, Message } from 'discord.js'
-import { web3, Program, Provider, Wallet, Context } from '@project-serum/anchor'
+import { web3, Program, Provider, Wallet } from '@project-serum/anchor'
+import { IDL, Soloha } from './soloha'
 import { getUserAddressAndBump, hashAuthorTag } from './util'
 
 export type EspressoParameters = {
   acceptedGms: string[]
   channelId: string
   clusterEndpoint: string
-  idl: any
   keypairPath: string
 }
 
 export default class Espresso {
   private client: Client
   private keypair: web3.Keypair
-  private program?: Program
+  private program?: Program<Soloha>
   private statePublicKey: web3.PublicKey
 
   constructor(public readonly version: string, private readonly params: EspressoParameters) {
@@ -44,7 +44,7 @@ export default class Espresso {
   async initialize() {
     const wallet = new Wallet(this.keypair)
     const provider = new Provider(new web3.Connection(this.params.clusterEndpoint), wallet, {})
-    this.program = new Program(this.params.idl, this.params.idl.metadata.address, provider)
+    this.program = new Program(IDL, new web3.PublicKey(process.env.PROGRAM_ID!), provider)
 
     const [key] = await web3.PublicKey.findProgramAddress(
       [Buffer.from('state')],
@@ -86,13 +86,16 @@ export default class Espresso {
           }
         })
 
-        const tx = this.program!.transaction.gm({ value: tagHash }, {
-          accounts: {
-            authority: this.keypair.publicKey,
-            state: this.statePublicKey,
-            user: pubkey
+        const tx = this.program!.transaction.gm(
+          { value: tagHash },
+          {
+            accounts: {
+              authority: this.keypair.publicKey,
+              state: this.statePublicKey,
+              user: pubkey
+            }
           }
-        } as Context)
+        )
 
         await web3.sendAndConfirmTransaction(
           this.program!.provider.connection,
