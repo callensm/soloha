@@ -1,477 +1,495 @@
 export type Soloha = {
-  version: '0.0.0'
-  name: 'soloha'
-  instructions: [
+  "version": "0.0.0",
+  "name": "soloha",
+  "instructions": [
     {
-      name: 'initialize'
-      accounts: [
+      "name": "initialize",
+      "accounts": [
         {
-          name: 'authority'
-          isMut: false
-          isSigner: true
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
         },
         {
-          name: 'state'
-          isMut: true
-          isSigner: false
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'systemProgram'
-          isMut: false
-          isSigner: false
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
         }
-      ]
-      args: [
+      ],
+      "args": [
         {
-          name: 'bump'
-          type: 'u8'
+          "name": "bump",
+          "type": "u8"
         }
       ]
     },
     {
-      name: 'register'
-      accounts: [
+      "name": "register",
+      "accounts": [
         {
-          name: 'owner'
-          isMut: true
-          isSigner: true
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          name: 'state'
-          isMut: true
-          isSigner: false
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'user'
-          isMut: true
-          isSigner: false
+          "name": "user",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'systemProgram'
-          isMut: false
-          isSigner: false
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
         }
-      ]
-      args: [
+      ],
+      "args": [
         {
-          name: 'tag'
-          type: {
-            defined: 'TagHash'
+          "name": "tag",
+          "type": {
+            "defined": "TagHash"
           }
         },
         {
-          name: 'bump'
-          type: 'u8'
+          "name": "bump",
+          "type": "u8"
         }
       ]
     },
     {
-      name: 'deregister'
-      accounts: [
+      "name": "deregister",
+      "accounts": [
         {
-          name: 'owner'
-          isMut: true
-          isSigner: true
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          name: 'state'
-          isMut: true
-          isSigner: false
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'user'
-          isMut: true
-          isSigner: false
+          "name": "user",
+          "isMut": true,
+          "isSigner": false
         }
-      ]
-      args: [
+      ],
+      "args": [
         {
-          name: 'tag'
-          type: {
-            defined: 'TagHash'
+          "name": "tag",
+          "type": {
+            "defined": "TagHash"
           }
         }
       ]
     },
     {
-      name: 'gm'
-      accounts: [
+      "name": "gm",
+      "accounts": [
         {
-          name: 'authority'
-          isMut: false
-          isSigner: true
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
         },
         {
-          name: 'state'
-          isMut: true
-          isSigner: false
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'user'
-          isMut: true
-          isSigner: false
+          "name": "user",
+          "isMut": true,
+          "isSigner": false
         }
-      ]
-      args: [
+      ],
+      "args": [
         {
-          name: 'tag'
-          type: {
-            defined: 'TagHash'
+          "name": "tag",
+          "type": {
+            "defined": "TagHash"
           }
         }
       ]
     }
-  ]
-  accounts: [
+  ],
+  "accounts": [
     {
-      name: 'state'
-      type: {
-        kind: 'struct'
-        fields: [
+      "name": "state",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            name: 'highestStreak'
-            type: 'u16'
+            "name": "highestStreak",
+            "type": "u16"
           },
           {
-            name: 'highestStreakOwner'
-            type: 'publicKey'
+            "name": "highestStreakOwner",
+            "type": "publicKey"
           },
           {
-            name: 'registered'
-            type: 'u64'
+            "name": "registered",
+            "type": "u64"
           },
           {
-            name: 'bump'
-            type: {
-              array: ['u8', 1]
+            "name": "bump",
+            "type": {
+              "array": [
+                "u8",
+                1
+              ]
             }
           }
         ]
       }
     },
     {
-      name: 'user'
-      type: {
-        kind: 'struct'
-        fields: [
+      "name": "user",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            name: 'bump'
-            type: {
-              array: ['u8', 1]
+            "name": "bump",
+            "type": {
+              "array": [
+                "u8",
+                1
+              ]
             }
           },
           {
-            name: 'lastGm'
-            type: 'u64'
+            "name": "lastGm",
+            "type": "u64"
           },
           {
-            name: 'owner'
-            type: 'publicKey'
+            "name": "owner",
+            "type": "publicKey"
           },
           {
-            name: 'streak'
-            type: 'u16'
+            "name": "streak",
+            "type": "u16"
           },
           {
-            name: 'total'
-            type: 'u16'
+            "name": "total",
+            "type": "u16"
           }
         ]
       }
     }
-  ]
-  types: [
+  ],
+  "types": [
     {
-      name: 'TagHash'
-      type: {
-        kind: 'struct'
-        fields: [
+      "name": "TagHash",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            name: 'value'
-            type: {
-              array: ['u8', 8]
+            "name": "value",
+            "type": {
+              "array": [
+                "u8",
+                8
+              ]
             }
           }
         ]
       }
     }
-  ]
-  events: [
+  ],
+  "events": [
     {
-      name: 'NewUser'
-      fields: [
+      "name": "NewUser",
+      "fields": [
         {
-          name: 'pubkey'
-          type: 'publicKey'
-          index: true
+          "name": "pubkey",
+          "type": "publicKey",
+          "index": true
         }
       ]
     },
     {
-      name: 'ClosedUser'
-      fields: [
+      "name": "ClosedUser",
+      "fields": [
         {
-          name: 'pubkey'
-          type: 'publicKey'
-          index: true
+          "name": "pubkey",
+          "type": "publicKey",
+          "index": true
         },
         {
-          name: 'gms'
-          type: 'u16'
-          index: false
+          "name": "gms",
+          "type": "u16",
+          "index": false
         }
       ]
     }
-  ]
-  errors: [
+  ],
+  "errors": [
     {
-      code: 300
-      name: 'MultipleAttemptsInOneDay'
-      msg: "user has gm'ed more than once in a single day"
+      "code": 300,
+      "name": "MultipleAttemptsInOneDay",
+      "msg": "user has gm'ed more than once in a single day"
     },
     {
-      code: 301
-      name: 'OwnerConstraintMismatch'
-      msg: 'The owner of the program account did not match the constraint'
+      "code": 301,
+      "name": "OwnerConstraintMismatch",
+      "msg": "The owner of the program account did not match the constraint"
     }
   ]
-}
+};
 
 export const IDL: Soloha = {
-  version: '0.0.0',
-  name: 'soloha',
-  instructions: [
+  "version": "0.0.0",
+  "name": "soloha",
+  "instructions": [
     {
-      name: 'initialize',
-      accounts: [
+      "name": "initialize",
+      "accounts": [
         {
-          name: 'authority',
-          isMut: false,
-          isSigner: true
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
         },
         {
-          name: 'state',
-          isMut: true,
-          isSigner: false
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'systemProgram',
-          isMut: false,
-          isSigner: false
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
-      args: [
+      "args": [
         {
-          name: 'bump',
-          type: 'u8'
+          "name": "bump",
+          "type": "u8"
         }
       ]
     },
     {
-      name: 'register',
-      accounts: [
+      "name": "register",
+      "accounts": [
         {
-          name: 'owner',
-          isMut: true,
-          isSigner: true
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          name: 'state',
-          isMut: true,
-          isSigner: false
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'user',
-          isMut: true,
-          isSigner: false
+          "name": "user",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'systemProgram',
-          isMut: false,
-          isSigner: false
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
-      args: [
+      "args": [
         {
-          name: 'tag',
-          type: {
-            defined: 'TagHash'
+          "name": "tag",
+          "type": {
+            "defined": "TagHash"
           }
         },
         {
-          name: 'bump',
-          type: 'u8'
+          "name": "bump",
+          "type": "u8"
         }
       ]
     },
     {
-      name: 'deregister',
-      accounts: [
+      "name": "deregister",
+      "accounts": [
         {
-          name: 'owner',
-          isMut: true,
-          isSigner: true
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          name: 'state',
-          isMut: true,
-          isSigner: false
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'user',
-          isMut: true,
-          isSigner: false
+          "name": "user",
+          "isMut": true,
+          "isSigner": false
         }
       ],
-      args: [
+      "args": [
         {
-          name: 'tag',
-          type: {
-            defined: 'TagHash'
+          "name": "tag",
+          "type": {
+            "defined": "TagHash"
           }
         }
       ]
     },
     {
-      name: 'gm',
-      accounts: [
+      "name": "gm",
+      "accounts": [
         {
-          name: 'authority',
-          isMut: false,
-          isSigner: true
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
         },
         {
-          name: 'state',
-          isMut: true,
-          isSigner: false
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'user',
-          isMut: true,
-          isSigner: false
+          "name": "user",
+          "isMut": true,
+          "isSigner": false
         }
       ],
-      args: [
+      "args": [
         {
-          name: 'tag',
-          type: {
-            defined: 'TagHash'
+          "name": "tag",
+          "type": {
+            "defined": "TagHash"
           }
         }
       ]
     }
   ],
-  accounts: [
+  "accounts": [
     {
-      name: 'state',
-      type: {
-        kind: 'struct',
-        fields: [
+      "name": "state",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            name: 'highestStreak',
-            type: 'u16'
+            "name": "highestStreak",
+            "type": "u16"
           },
           {
-            name: 'highestStreakOwner',
-            type: 'publicKey'
+            "name": "highestStreakOwner",
+            "type": "publicKey"
           },
           {
-            name: 'registered',
-            type: 'u64'
+            "name": "registered",
+            "type": "u64"
           },
           {
-            name: 'bump',
-            type: {
-              array: ['u8', 1]
+            "name": "bump",
+            "type": {
+              "array": [
+                "u8",
+                1
+              ]
             }
           }
         ]
       }
     },
     {
-      name: 'user',
-      type: {
-        kind: 'struct',
-        fields: [
+      "name": "user",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            name: 'bump',
-            type: {
-              array: ['u8', 1]
+            "name": "bump",
+            "type": {
+              "array": [
+                "u8",
+                1
+              ]
             }
           },
           {
-            name: 'lastGm',
-            type: 'u64'
+            "name": "lastGm",
+            "type": "u64"
           },
           {
-            name: 'owner',
-            type: 'publicKey'
+            "name": "owner",
+            "type": "publicKey"
           },
           {
-            name: 'streak',
-            type: 'u16'
+            "name": "streak",
+            "type": "u16"
           },
           {
-            name: 'total',
-            type: 'u16'
+            "name": "total",
+            "type": "u16"
           }
         ]
       }
     }
   ],
-  types: [
+  "types": [
     {
-      name: 'TagHash',
-      type: {
-        kind: 'struct',
-        fields: [
+      "name": "TagHash",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            name: 'value',
-            type: {
-              array: ['u8', 8]
+            "name": "value",
+            "type": {
+              "array": [
+                "u8",
+                8
+              ]
             }
           }
         ]
       }
     }
   ],
-  events: [
+  "events": [
     {
-      name: 'NewUser',
-      fields: [
+      "name": "NewUser",
+      "fields": [
         {
-          name: 'pubkey',
-          type: 'publicKey',
-          index: true
+          "name": "pubkey",
+          "type": "publicKey",
+          "index": true
         }
       ]
     },
     {
-      name: 'ClosedUser',
-      fields: [
+      "name": "ClosedUser",
+      "fields": [
         {
-          name: 'pubkey',
-          type: 'publicKey',
-          index: true
+          "name": "pubkey",
+          "type": "publicKey",
+          "index": true
         },
         {
-          name: 'gms',
-          type: 'u16',
-          index: false
+          "name": "gms",
+          "type": "u16",
+          "index": false
         }
       ]
     }
   ],
-  errors: [
+  "errors": [
     {
-      code: 300,
-      name: 'MultipleAttemptsInOneDay',
-      msg: "user has gm'ed more than once in a single day"
+      "code": 300,
+      "name": "MultipleAttemptsInOneDay",
+      "msg": "user has gm'ed more than once in a single day"
     },
     {
-      code: 301,
-      name: 'OwnerConstraintMismatch',
-      msg: 'The owner of the program account did not match the constraint'
+      "code": 301,
+      "name": "OwnerConstraintMismatch",
+      "msg": "The owner of the program account did not match the constraint"
     }
   ]
-}
+};

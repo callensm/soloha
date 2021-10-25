@@ -1,5 +1,0 @@
-.env
-src/**/*.json
-
-build/
-node_modules/

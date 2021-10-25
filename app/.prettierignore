@@ -1,5 +1,0 @@
-lib/*.json
-
-.next/
-node_modules/
-public/

@@ -1,6 +1,0 @@
-next.config.js
-
-.next/
-build/
-node_modules/
-public/

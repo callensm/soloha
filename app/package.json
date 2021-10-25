@@ -5,8 +5,8 @@
   "scripts": {
     "build": "npm run clean && next build",
     "clean": "rm -rf .next/",
-    "lint": "next lint && prettier . --check",
-    "fmt": "prettier . --write",
+    "lint": "next lint --ignore-path ../.eslintignore && prettier . --check --ignore-path ../.prettierignore",
+    "fmt": "prettier . --write --ignore-path ../.prettierignore",
     "start": "next dev"
   },
   "dependencies": {

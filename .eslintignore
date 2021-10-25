@@ -1,0 +1,10 @@
+**/.env*
+**/soloha.ts
+**/soloha.json
+**/next.config.js
+
+.next/
+build/
+lib/
+node_modules/
+public/
