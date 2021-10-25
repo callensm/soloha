@@ -7,7 +7,7 @@
     "idl": "npm run idl:app && npm run idl:discord",
     "idl:app": "cp target/types/soloha.ts app/lib/idl && cp target/idl/soloha.json app/lib/idl",
     "idl:discord": "cp target/types/soloha.ts discord/src/idl && cp target/idl/soloha.json discord/src/idl",
-    "lint:app": "eslint app/ --config app/.eslintrc",
+    "lint:app": "cd app && npx next lint --ignore-path ../.eslintignore",
     "lint:discord": "eslint discord/ --ext .ts --config discord/.eslintrc"
   },
   "dependencies": {
