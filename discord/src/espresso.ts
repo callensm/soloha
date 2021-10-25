@@ -3,6 +3,7 @@ import { Client, Intents, Message } from 'discord.js'
 import { web3, Program, Provider, Wallet } from '@project-serum/anchor'
 import { Soloha } from './idl/soloha'
 import { getUserAddressAndBump, hashAuthorTag } from './util'
+import idl from './idl/soloha.json'
 
 export type EspressoParameters = {
   acceptedGms: string[]
@@ -18,7 +19,7 @@ export type EspressoParameters = {
  * @class Espresso
  */
 export default class Espresso {
-  private static PROGRAM_ID: string = 'LHAPYTbqXFzkNxojt16Mx5gtAnnbhkZfMyLvU9xsKVe'
+  private static PROGRAM_ID = 'LHAPYTbqXFzkNxojt16Mx5gtAnnbhkZfMyLvU9xsKVe'
 
   private client: Client
   private keypair: web3.Keypair
@@ -64,7 +65,7 @@ export default class Espresso {
   async initialize() {
     const wallet = new Wallet(this.keypair)
     const provider = new Provider(new web3.Connection(this.params.clusterEndpoint), wallet, {})
-    this.program = new Program<Soloha>(require('./idl/soloha.json'), Espresso.PROGRAM_ID, provider)
+    this.program = new Program<Soloha>(idl as any, Espresso.PROGRAM_ID, provider)
 
     const [key] = await web3.PublicKey.findProgramAddress(
       [Buffer.from('state')],
