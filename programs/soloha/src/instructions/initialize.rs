@@ -8,7 +8,7 @@ pub struct InitializeState<'info> {
     pub authority: Signer<'info>,
 
     #[account(
-        init,
+        init_if_needed,
         payer = authority,
         seeds = [
             seeds::STATE

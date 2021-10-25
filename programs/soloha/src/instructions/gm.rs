@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::error::ErrorCode;
+use crate::error::CustomErrorCode;
 use crate::{seeds, State, TagHash, User};
 
 /// Constant definition for the number of seconds
@@ -44,7 +44,7 @@ pub fn handler(ctx: Context<GM>, _tag: TagHash) -> ProgramResult {
     let elapsed_since: u64 = current_time.checked_sub(user.last_gm).unwrap();
 
     if elapsed_since <= ONE_DAY {
-        return Err(ErrorCode::MultipleAttemptsInOneDay.into());
+        return Err(CustomErrorCode::MultipleAttemptsInOneDay.into());
     } else if elapsed_since > ONE_DAY * 2 {
         user.streak = 0;
     }

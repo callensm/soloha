@@ -14,6 +14,7 @@
 
 use anchor_lang::prelude::*;
 
+use crate::error::CustomErrorCode;
 use crate::event::ClosedUser;
 use crate::{seeds, State, TagHash, User};
 
@@ -39,10 +40,10 @@ pub struct Deregister<'info> {
             tag.value.as_ref()
         ],
         bump = user.bump[0],
-        has_one = owner,
+        has_one = owner @ CustomErrorCode::OwnerConstraintMismatch,
         close = owner,
     )]
-    pub user: Account<'info, User>,
+    pub user: Box<Account<'info, User>>,
 }
 
 pub fn handler(ctx: Context<Deregister>, _tag: TagHash) -> ProgramResult {

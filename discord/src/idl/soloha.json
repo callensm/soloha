@@ -228,6 +228,11 @@
       "code": 300,
       "name": "MultipleAttemptsInOneDay",
       "msg": "user has gm'ed more than once in a single day"
+    },
+    {
+      "code": 301,
+      "name": "OwnerConstraintMismatch",
+      "msg": "The owner of the program account did not match the constraint"
     }
   ],
   "metadata": {
