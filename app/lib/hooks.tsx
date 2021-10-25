@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useConnection, useWallet, AnchorWallet } from '@solana/wallet-adapter-react'
 import { BN, Program, ProgramAccount, Provider, web3 } from '@project-serum/anchor'
-import { Soloha } from './idl/soloha'
-import idl from './idl/soloha.json'
+import { IDL, Soloha } from './idl/soloha'
 import { getStateProgramAddress, getUserProgramAddress, hashDiscordTag } from './util'
 import { notifyStateFetchError, notifyUserFetchError } from './notifications'
 
@@ -34,7 +33,7 @@ export const useAnchor = (): Program<Soloha> => {
 
   return useMemo(() => {
     const provider = new Provider(connection, wallet as AnchorWallet, {})
-    return new Program<Soloha>(idl as any, PROGRAM_ID, provider)
+    return new Program<Soloha>(IDL, PROGRAM_ID, provider)
   }, [connection, wallet])
 }
 

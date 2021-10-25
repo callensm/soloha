@@ -1,9 +1,8 @@
 import { readFileSync } from 'fs'
 import { Client, Intents, Message } from 'discord.js'
 import { web3, Program, Provider, Wallet } from '@project-serum/anchor'
-import { Soloha } from './idl/soloha'
+import { IDL, Soloha } from './idl/soloha'
 import { getUserAddressAndBump, hashAuthorTag } from './util'
-import idl from './idl/soloha.json'
 
 export type EspressoParameters = {
   acceptedGms: string[]
@@ -65,7 +64,7 @@ export default class Espresso {
   async initialize() {
     const wallet = new Wallet(this.keypair)
     const provider = new Provider(new web3.Connection(this.params.clusterEndpoint), wallet, {})
-    this.program = new Program<Soloha>(idl as any, Espresso.PROGRAM_ID, provider)
+    this.program = new Program<Soloha>(IDL, Espresso.PROGRAM_ID, provider)
 
     const [key] = await web3.PublicKey.findProgramAddress(
       [Buffer.from('state')],
