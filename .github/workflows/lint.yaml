@@ -21,8 +21,15 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
 
-      - name: Install Dependencies
+      - name: Install Root Dependencies
+        run: npm ci
 
+      - name: Install App Dependencies
+        working-directory: app
+        run: npm ci
+
+      - name: Install Discord Dependencies
+        working-directory: discord
         run: npm ci
 
       - name: Lint
