@@ -15,7 +15,9 @@ export const hashDiscordTag = (tag: string): Buffer => Buffer.from(crc32.str(tag
  * @param {web3.PublicKey} programId
  * @returns {Promise<[web3.PublicKey, number]>}
  */
-export const getStateProgramAddress = (programId: web3.PublicKey) =>
+export const getStateProgramAddress = (
+  programId: web3.PublicKey
+): Promise<[web3.PublicKey, number]> =>
   web3.PublicKey.findProgramAddress([Buffer.from('state')], programId)
 
 /**
@@ -25,5 +27,8 @@ export const getStateProgramAddress = (programId: web3.PublicKey) =>
  * @param {web3.PublicKey} programId
  * @returns {Promise<[web3.PublicKey, number]>}
  */
-export const getUserProgramAddress = (tagHash: Buffer, programId: web3.PublicKey) =>
+export const getUserProgramAddress = (
+  tagHash: Buffer,
+  programId: web3.PublicKey
+): Promise<[web3.PublicKey, number]> =>
   web3.PublicKey.findProgramAddress([Buffer.from('user'), tagHash], programId)

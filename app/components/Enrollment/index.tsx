@@ -1,10 +1,11 @@
 import { CSSProperties, FunctionComponent, useCallback, useState } from 'react'
-import { Avatar, Comment, notification, Spin } from 'antd'
+import { Avatar, Comment, Spin } from 'antd'
 import { web3, Context, ProgramAccount } from '@project-serum/anchor'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import dayjs from 'dayjs'
 import Coffee from './Coffee'
 import { useAnchor, useGlobalState } from '../../lib/hooks'
+import { notifySolScan, notifyTransactionError } from '../../lib/notifications'
 import { getUserProgramAddress, getStateProgramAddress, hashDiscordTag } from '../../lib/util'
 
 interface EnrollmentProps {
@@ -57,9 +58,9 @@ const Enrollment: FunctionComponent<EnrollmentProps> = props => {
       const sig = await sendTransaction(tx, connection)
       await connection.confirmTransaction(sig, 'confirmed')
 
-      displayExplorerNotification(sig)
+      notifySolScan(sig)
     } catch (err) {
-      displayTransactionError(err as Error)
+      notifyTransactionError(err as Error)
     } finally {
       setLoading(false)
     }
@@ -92,38 +93,6 @@ const containerStyle: CSSProperties = {
   border: '1px solid rgba(255, 255, 255, 0.15)',
   borderRadius: 10,
   padding: '1em 3em 1em 3em'
-}
-
-/**
- * Display an Antd success notification with a link
- * to the transaction signature on Solana Explorer
- * @param {string} signature
- */
-function displayExplorerNotification(signature: string) {
-  notification.success({
-    message: 'Transaction Success',
-    description: (
-      <a target="_blank" rel="noreferrer" href={`https://explorer.solana.com/tx/${signature}`}>
-        View on Explorer
-      </a>
-    ),
-    placement: 'bottomLeft',
-    duration: 20
-  })
-}
-
-/**
- * Display an Antd error notification with the
- * transaction error message for the user to see
- * @param {Error} err
- */
-function displayTransactionError(err: Error) {
-  notification.error({
-    message: 'Transaction Error',
-    description: (err as Error).message,
-    placement: 'bottomLeft',
-    duration: 20
-  })
 }
 
 export default Enrollment

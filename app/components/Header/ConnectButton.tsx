@@ -1,15 +1,18 @@
-import { FunctionComponent, useCallback, useMemo } from 'react'
+import { FunctionComponent, useCallback, useEffect, useMemo } from 'react'
 import { Button, Space } from 'antd'
 import { WalletOutlined } from '@ant-design/icons'
 import { WalletNotConnectedError } from '@solana/wallet-adapter-base'
 import { useWalletModal } from '@solana/wallet-adapter-react-ui'
 import { useWallet } from '@solana/wallet-adapter-react'
+import { notifyWalletConnectionStatus } from '../../lib/notifications'
 
 interface ConnectButtonProps {}
 
 const ConnectButton: FunctionComponent<ConnectButtonProps> = _props => {
   const modal = useWalletModal()
   const { wallet, disconnect, connect, publicKey, connected, connecting } = useWallet()
+
+  useEffect(() => notifyWalletConnectionStatus(connected), [connected])
 
   const handleOpenModal = useCallback(() => modal.setVisible(true), [modal])
 
@@ -24,10 +27,12 @@ const ConnectButton: FunctionComponent<ConnectButtonProps> = _props => {
   }, [wallet, connect])
 
   const handleResetWallet = useCallback(async () => {
-    disconnect()
-
-    if (wallet) {
-      await disconnect()
+    try {
+      if (wallet) {
+        await disconnect()
+      }
+    } catch (err) {
+      console.error(err)
     }
   }, [wallet, disconnect])
 

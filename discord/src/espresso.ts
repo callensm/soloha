@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs'
 import { Client, Intents, Message } from 'discord.js'
 import { web3, Program, Provider, Wallet } from '@project-serum/anchor'
-import { IDL, Soloha } from './soloha'
+import { Soloha } from './idl/soloha'
 import { getUserAddressAndBump, hashAuthorTag } from './util'
 
 export type EspressoParameters = {
@@ -11,12 +11,26 @@ export type EspressoParameters = {
   keypairPath: string
 }
 
+/**
+ * The implementation and event handling class for the Discord
+ * server bot to handle the transactions and message hooks.
+ * @export
+ * @class Espresso
+ */
 export default class Espresso {
+  private static PROGRAM_ID: string = 'LHAPYTbqXFzkNxojt16Mx5gtAnnbhkZfMyLvU9xsKVe'
+
   private client: Client
   private keypair: web3.Keypair
   private program?: Program<Soloha>
   private statePublicKey: web3.PublicKey
 
+  /**
+   * Creates an instance of Espresso.
+   * @param {string} version
+   * @param {EspressoParameters} params
+   * @memberof Espresso
+   */
   constructor(public readonly version: string, private readonly params: EspressoParameters) {
     this.client = new Client({
       intents: [
@@ -41,10 +55,16 @@ export default class Espresso {
     this.client.on('messageCreate', this._onMessage)
   }
 
+  /**
+   * Builds the `anchor.Program` instance for the Soloha
+   * IDL and derives and sets the global state public key
+   * as a class property.
+   * @memberof Espresso
+   */
   async initialize() {
     const wallet = new Wallet(this.keypair)
     const provider = new Provider(new web3.Connection(this.params.clusterEndpoint), wallet, {})
-    this.program = new Program(IDL, new web3.PublicKey(process.env.PROGRAM_ID!), provider)
+    this.program = new Program<Soloha>(require('./idl/soloha.json'), Espresso.PROGRAM_ID, provider)
 
     const [key] = await web3.PublicKey.findProgramAddress(
       [Buffer.from('state')],
@@ -54,6 +74,12 @@ export default class Espresso {
     this.statePublicKey = key
   }
 
+  /**
+   * Initiates the Discord bot client login so it can
+   * begin to listening and processing new GM messages.
+   * @param {string} token
+   * @memberof Espresso
+   */
   async run(token: string) {
     try {
       await this.client.login(token)
@@ -63,11 +89,23 @@ export default class Espresso {
     }
   }
 
-  private _onReady = () => {
+  /**
+   * Simple logging handler for when the client connects.
+   * @private
+   * @memberof Espresso
+   */
+  private _onReady() {
     console.log(`Logged in as ${this.client.user?.tag}`)
   }
 
-  private _onMessage = async (msg: Message) => {
+  /**
+   * New message event handler to process the on-chain
+   * instruction transaction for a properly formed "gm".
+   * @private
+   * @param {Message} msg
+   * @memberof Espresso
+   */
+  private async _onMessage(msg: Message) {
     if (msg.channelId !== this.params.channelId || msg.author.bot) return
 
     const isGm: boolean = this.params.acceptedGms.some(gm => msg.content.trim().startsWith(gm))
@@ -77,6 +115,10 @@ export default class Espresso {
 
       const tagHash: Buffer = hashAuthorTag(msg.author.tag)
       const [pubkey] = await getUserAddressAndBump(this.program!.programId, tagHash)
+
+      const user = await this.program!.account.user.fetchNullable(pubkey)
+      if (!user) return
+
       const listener = this.program!.account.user.subscribe(pubkey, 'confirmed')
 
       try {
@@ -107,7 +149,6 @@ export default class Espresso {
         await msg.react('☕')
       } catch (e) {
         console.error(`GM instruction failure: ${e}`)
-        await msg.delete()
       } finally {
         listener.removeAllListeners()
         await this.program!.account.user.unsubscribe(pubkey)

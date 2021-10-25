@@ -38,21 +38,6 @@ const HomePage: NextPage = () => {
           <Typography.Title level={3} style={{ marginTop: 0, marginBottom: '2em' }}>
             Make saying &quot;gm&quot; a little more meaningful.
           </Typography.Title>
-          {/* {session && session.user ? (
-            <>
-              <Image
-                src={session.user.image as string}
-                alt="discord-pfp"
-                height={100}
-                width={100}
-              />
-              <Typography.Paragraph>{session.user.name}</Typography.Paragraph>
-            </>
-          ) : (
-            <Button onClick={() => signIn('discord', { redirect: false })}>
-              Discord Authentication
-            </Button>
-          )} */}
           <Enrollment discordTag={discordTag} user={user} />
         </Content>
       </Layout>

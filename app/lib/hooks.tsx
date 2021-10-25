@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
-import { notification } from 'antd'
-import { useConnection, useAnchorWallet } from '@solana/wallet-adapter-react'
-import { BN, Program, ProgramAccount, Provider, Wallet, web3 } from '@project-serum/anchor'
-import { IDL, Soloha } from './soloha'
+import { useConnection, useWallet, AnchorWallet } from '@solana/wallet-adapter-react'
+import { BN, Program, ProgramAccount, Provider, web3 } from '@project-serum/anchor'
+import { Soloha } from './idl/soloha'
 import { getStateProgramAddress, getUserProgramAddress, hashDiscordTag } from './util'
+import { notifyStateFetchError, notifyUserFetchError } from './notifications'
+
+const PROGRAM_ID: string = 'LHAPYTbqXFzkNxojt16Mx5gtAnnbhkZfMyLvU9xsKVe'
 
 type GlobalState = {
   highestStreak: number
@@ -27,11 +29,11 @@ type User = {
  */
 export const useAnchor = (): Program<Soloha> => {
   const { connection } = useConnection()
-  const wallet = useAnchorWallet()
+  const wallet = useWallet()
 
   return useMemo(() => {
-    const provider = new Provider(connection, wallet as Wallet, {})
-    return new Program(IDL, new web3.PublicKey(process.env.NEXT_PUBLIC_PROGRAM_ID!), provider)
+    const provider = new Provider(connection, wallet as AnchorWallet, {})
+    return new Program<Soloha>(require('./idl/soloha.json'), PROGRAM_ID, provider)
   }, [connection, wallet])
 }
 
@@ -66,14 +68,7 @@ export const useUser = (tag?: string): ProgramAccount<User> | null => {
           setUser({ account: u as User, publicKey: userKey })
         }
       })
-      .catch(err => {
-        notification.error({
-          message: 'User Fetch Error',
-          description: (err as Error).message,
-          placement: 'bottomLeft',
-          duration: 20
-        })
-      })
+      .catch(notifyUserFetchError)
   }, [program, userKey])
 
   return user
@@ -86,26 +81,22 @@ export const useGlobalState = (): ProgramAccount<GlobalState> | null => {
   const [state, setState] = useState<ProgramAccount<GlobalState> | null>(null)
 
   useEffect(() => {
+    if (stateKey) return
     getStateProgramAddress(program.programId)
-      .then(([key]: [web3.PublicKey, number]) => setStateKey(key))
+      .then(addr => setStateKey(addr[0]))
       .catch(console.error)
-  }, [program])
+  }, [program, stateKey])
 
   useEffect(() => {
     if (!stateKey) return
-
     program.account.state
       .fetch(stateKey)
       .then(s => setState({ account: s as GlobalState, publicKey: stateKey }))
       .catch(err => {
-        notification.error({
-          message: 'State Fetch Error',
-          description: (err as Error).message,
-          placement: 'bottomLeft',
-          duration: 20
-        })
+        console.log(err)
+        notifyStateFetchError(err)
       })
-  }, [program, stateKey])
+  }, [stateKey])
 
   return state
 }
