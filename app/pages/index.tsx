@@ -1,4 +1,4 @@
-import { CSSProperties, useEffect, useState } from 'react'
+import { CSSProperties, useEffect } from 'react'
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
@@ -13,11 +13,10 @@ import { useUser } from '../lib/hooks'
 const { Content } = Layout
 
 const HomePage: NextPage = () => {
-  const [discordTag, setDiscordTag] = useState<string | undefined>(undefined)
-  const user = useUser(discordTag)
+  const { setTag } = useUser()
   const [session] = useSession()
 
-  useEffect(() => setDiscordTag(session?.user?.name ?? undefined), [session])
+  useEffect(() => setTag(session?.user?.name ?? null), [session])
 
   return (
     <>
@@ -38,7 +37,7 @@ const HomePage: NextPage = () => {
           <Typography.Title level={3} style={{ marginTop: 0, marginBottom: '2em' }}>
             Make saying &quot;gm&quot; a little more meaningful.
           </Typography.Title>
-          <Enrollment discordTag={discordTag} user={user} />
+          <Enrollment />
         </Content>
       </Layout>
     </>

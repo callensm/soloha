@@ -7,4 +7,7 @@ pub enum CustomErrorCode {
 
     #[msg("The owner of the program account did not match the constraint")]
     OwnerConstraintMismatch,
+
+    #[msg("The authority constraint on mutating the state account was not met")]
+    StateAccountAuthorityMismatch,
 }

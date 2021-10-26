@@ -14,7 +14,7 @@ pub struct InitializeState<'info> {
             seeds::STATE
         ],
         bump = bump,
-        space = 8 + 2 + 32 + 8 + 1,
+        space = 8 + 32 + 2 + 32 + 8 + 1,
     )]
     pub state: Box<Account<'info, State>>,
 
@@ -23,6 +23,7 @@ pub struct InitializeState<'info> {
 
 #[account]
 pub struct State {
+    pub authority: Pubkey,
     pub highest_streak: u16,
     pub highest_streak_owner: Pubkey,
     pub registered: u64,
@@ -31,6 +32,7 @@ pub struct State {
 
 pub fn handler(ctx: Context<InitializeState>, bump: u8) -> ProgramResult {
     let state = &mut ctx.accounts.state;
+    state.authority = ctx.accounts.authority.key();
     state.highest_streak = 0;
     state.highest_streak_owner = Pubkey::default();
     state.registered = 0;

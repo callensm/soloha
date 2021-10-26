@@ -145,6 +145,10 @@ export type Soloha = {
         "kind": "struct",
         "fields": [
           {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
             "name": "highestStreak",
             "type": "u16"
           },
@@ -258,6 +262,11 @@ export type Soloha = {
       "code": 301,
       "name": "OwnerConstraintMismatch",
       "msg": "The owner of the program account did not match the constraint"
+    },
+    {
+      "code": 302,
+      "name": "StateAccountAuthorityMismatch",
+      "msg": "The authority constraint on mutating the state account was not met"
     }
   ]
 };
@@ -409,6 +418,10 @@ export const IDL: Soloha = {
         "kind": "struct",
         "fields": [
           {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
             "name": "highestStreak",
             "type": "u16"
           },
@@ -522,6 +535,11 @@ export const IDL: Soloha = {
       "code": 301,
       "name": "OwnerConstraintMismatch",
       "msg": "The owner of the program account did not match the constraint"
+    },
+    {
+      "code": 302,
+      "name": "StateAccountAuthorityMismatch",
+      "msg": "The authority constraint on mutating the state account was not met"
     }
   ]
 };

@@ -2,7 +2,7 @@ import { CSSProperties, FunctionComponent, useMemo } from 'react'
 import { Tag } from 'antd'
 
 interface CoffeeProps {
-  count: number
+  count: string
   enabled: boolean
   isRegistered: boolean
   onClick: () => void | Promise<void>

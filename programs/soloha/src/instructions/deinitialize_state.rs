@@ -1,5 +1,6 @@
 use anchor_lang::prelude::*;
 
+use crate::error::CustomErrorCode;
 use crate::seeds;
 use crate::State;
 
@@ -13,6 +14,7 @@ pub struct DeinitializeState<'info> {
             seeds::STATE
         ],
         bump = state.bump[0],
+        has_one = authority @ CustomErrorCode::StateAccountAuthorityMismatch,
         close = authority,
     )]
     pub state: Box<Account<'info, State>>,
