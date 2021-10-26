@@ -3,10 +3,10 @@
   "private": true,
   "author": "Matthew Callens <callensmatt@gmail.com>",
   "scripts": {
-    "build": "npm run clean && next build",
-    "clean": "rm -rf .next/",
+    "build": "rm -rf .next/ && NODE_ENV=production next build",
     "lint": "next lint",
-    "start": "next dev"
+    "start:dev": "next dev",
+    "start": "next start -p $PORT"
   },
   "dependencies": {
     "@ant-design/icons": "^4.7.0",

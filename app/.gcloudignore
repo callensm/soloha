@@ -1,0 +1,11 @@
+.git/
+./components/
+./lib/
+node_modules/
+./pages/
+./styles/
+
+.eslint*
+*.d.ts
+next.config.js
+tsconfig.json

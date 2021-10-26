@@ -1,0 +1,17 @@
+env: standard
+service: default
+runtime: nodejs16
+instance_class: F1
+
+automatic_scaling:
+  min_idle_instances: 1
+  min_instances: 1
+
+env_variables:
+  NODE_ENV: production
+
+handlers:
+  - url: /.*
+    secure: always
+    script: auto
+    redirect_http_response_code: 307

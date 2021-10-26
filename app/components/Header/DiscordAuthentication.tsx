@@ -13,7 +13,7 @@ const DiscordAuthentication: FunctionComponent = () => {
         <Button
           type="primary"
           icon={<img id="discord-btn-icon" src="/discord_icon.svg" width={20} />}
-          onClick={() => signIn('discord', { redirect: false })}
+          onClick={() => signIn('discord')}
         >
           Discord Login
         </Button>
