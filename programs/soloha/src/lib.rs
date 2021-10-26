@@ -31,8 +31,12 @@ mod seeds {
 pub mod soloha {
     use super::*;
 
-    pub fn initialize(ctx: Context<InitializeState>, bump: u8) -> ProgramResult {
-        instructions::initialize::handler(ctx, bump)
+    pub fn deinitialize_state(ctx: Context<DeinitializeState>) -> ProgramResult {
+        instructions::deinitialize_state::handler(ctx)
+    }
+
+    pub fn initialize_state(ctx: Context<InitializeState>, bump: u8) -> ProgramResult {
+        instructions::initialize_state::handler(ctx, bump)
     }
 
     pub fn register(ctx: Context<Register>, tag: TagHash, bump: u8) -> ProgramResult {

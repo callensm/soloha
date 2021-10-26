@@ -1,12 +1,12 @@
 import { CSSProperties, FunctionComponent, useCallback, useState } from 'react'
 import { Avatar, Comment, Spin } from 'antd'
-import { web3, Context, ProgramAccount } from '@project-serum/anchor'
+import { web3, ProgramAccount } from '@project-serum/anchor'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import dayjs from 'dayjs'
 import Coffee from './Coffee'
 import { useAnchor, useGlobalState } from '../../lib/hooks'
 import { notifySolScan, notifyTransactionError } from '../../lib/notifications'
-import { getUserProgramAddress, getStateProgramAddress, hashDiscordTag } from '../../lib/util'
+import { getUserProgramAddress, hashDiscordTag } from '../../lib/util'
 
 interface EnrollmentProps {
   discordTag?: string
@@ -20,45 +20,44 @@ const Enrollment: FunctionComponent<EnrollmentProps> = props => {
   const { connection } = useConnection()
 
   const [loading, setLoading] = useState<boolean>(false)
-  const [registeredCount, _setRegisteredCount] = useState<number>(
-    state?.account.registered.toNumber() || 0
-  )
 
   const handleCoffeeClick = useCallback(async () => {
-    if (!publicKey || !props.discordTag) return
+    if (!publicKey || !state || !props.discordTag) return
 
     setLoading(true)
 
-    const [stateKey] = await getStateProgramAddress(program.programId)
-    const tagHash = { value: hashDiscordTag(props.discordTag) }
-    const [userKey, userBump] = await getUserProgramAddress(tagHash.value, program.programId)
+    const tagHash = hashDiscordTag(props.discordTag)
+    const [userKey, userBump] = await getUserProgramAddress(tagHash, program.programId)
 
     let tx: web3.Transaction
 
     try {
       if (props.user) {
-        tx = program.transaction.deregister(tagHash, {
-          accounts: {
-            owner: publicKey,
-            state: stateKey,
-            user: userKey
+        tx = program.transaction.deregister(
+          { value: [...tagHash] },
+          {
+            accounts: {
+              owner: publicKey,
+              state: state.publicKey,
+              user: userKey
+            }
           }
-        } as Context)
+        )
       } else {
-        tx = program.transaction.register(tagHash, userBump, {
+        tx = program.transaction.register({ value: [...tagHash] }, userBump, {
           accounts: {
             owner: publicKey,
-            state: stateKey,
+            state: state.publicKey,
             user: userKey,
             systemProgram: web3.SystemProgram.programId
           }
-        } as Context)
+        })
       }
 
       const sig = await sendTransaction(tx, connection)
       await connection.confirmTransaction(sig, 'confirmed')
 
-      notifySolScan(sig)
+      notifySolScan(sig, 'devnet')
     } catch (err) {
       notifyTransactionError(err as Error)
     } finally {
@@ -77,8 +76,8 @@ const Enrollment: FunctionComponent<EnrollmentProps> = props => {
           actions={[
             <Coffee
               key="coffee-tag"
-              count={registeredCount}
-              enabled={publicKey !== null && ready}
+              count={state?.account.registered.toNumber() ?? 0}
+              enabled={publicKey !== null && props.discordTag !== undefined && ready}
               isRegistered={props.user !== null}
               onClick={handleCoffeeClick}
             />

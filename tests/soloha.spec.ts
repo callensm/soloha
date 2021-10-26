@@ -3,6 +3,7 @@ import { NodeWallet } from '@project-serum/anchor/src/provider'
 import { assert, use as chaiUse } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import crc32 from 'crc-32'
+import { Soloha } from '../target/types/soloha'
 
 chaiUse(chaiAsPromised)
 
@@ -12,7 +13,7 @@ const tagHash = Buffer.from(crc32.str(discordTag).toString(16))
 describe('soloha', () => {
   anchor.setProvider(anchor.Provider.env())
 
-  const program: anchor.Program = anchor.workspace.Soloha
+  const program: anchor.Program<Soloha> = anchor.workspace.Soloha
   const authority = (program.provider.wallet as NodeWallet).payer
   const owner = anchor.web3.Keypair.generate()
 
@@ -30,21 +31,21 @@ describe('soloha', () => {
     await program.provider.connection.confirmTransaction(sig)
   })
 
-  describe('initialize instruction', () => {
+  describe('initialize_state instruction', () => {
     before(async () => {
       ;[stateKey, stateBump] = await anchor.web3.PublicKey.findProgramAddress(
         [Buffer.from('state')],
         program.programId
       )
 
-      await program.rpc.initialize(stateBump, {
+      await program.rpc.initializeState(stateBump, {
         accounts: {
           authority: authority.publicKey,
           state: stateKey,
           systemProgram: anchor.web3.SystemProgram.programId
         },
         signers: [authority]
-      } as anchor.Context)
+      })
     })
 
     it('creates the global state pda', async () => {
@@ -62,7 +63,7 @@ describe('soloha', () => {
         program.programId
       )
 
-      await program.rpc.register({ value: tagHash }, userBump, {
+      await program.rpc.register({ value: tagHash.toJSON().data }, userBump, {
         accounts: {
           owner: owner.publicKey,
           state: stateKey,
@@ -70,7 +71,7 @@ describe('soloha', () => {
           systemProgram: anchor.web3.SystemProgram.programId
         },
         signers: [owner]
-      } as anchor.Context)
+      })
     })
 
     it('creates a new user account for the user', async () => {
@@ -100,14 +101,17 @@ describe('soloha', () => {
     let userData: any
 
     before(async () => {
-      await program.rpc.gm({ value: tagHash }, {
-        accounts: {
-          authority: authority.publicKey,
-          state: stateKey,
-          user: userKey
-        },
-        signers: [authority]
-      } as anchor.Context)
+      await program.rpc.gm(
+        { value: tagHash.toJSON().data },
+        {
+          accounts: {
+            authority: authority.publicKey,
+            state: stateKey,
+            user: userKey
+          },
+          signers: [authority]
+        }
+      )
 
       userData = await program.account.user.fetch(userKey)
     })
@@ -122,13 +126,17 @@ describe('soloha', () => {
 
     it('fails when done more than once per day', () => {
       assert.isRejected(
-        program.rpc.gm({ value: tagHash }, {
-          accounts: {
-            authority: authority.publicKey,
-            user: userKey
-          },
-          signers: [authority]
-        } as anchor.Context)
+        program.rpc.gm(
+          { value: tagHash.toJSON().data },
+          {
+            accounts: {
+              authority: authority.publicKey,
+              state: stateKey,
+              user: userKey
+            },
+            signers: [authority]
+          }
+        )
       )
     })
 
@@ -141,14 +149,17 @@ describe('soloha', () => {
 
   describe('deregister instruction', () => {
     before(async () => {
-      await program.rpc.deregister({ value: tagHash }, {
-        accounts: {
-          owner: owner.publicKey,
-          state: stateKey,
-          user: userKey
-        },
-        signers: [owner]
-      } as anchor.Context)
+      await program.rpc.deregister(
+        { value: tagHash.toJSON().data },
+        {
+          accounts: {
+            owner: owner.publicKey,
+            state: stateKey,
+            user: userKey
+          },
+          signers: [owner]
+        }
+      )
     })
 
     it('closes the user account passed', async () => {
@@ -159,6 +170,23 @@ describe('soloha', () => {
     it('updates global state to decrement registered count', async () => {
       const state = await program.account.state.fetch(stateKey)
       assert.strictEqual((state.registered as anchor.BN).toNumber(), 0)
+    })
+  })
+
+  describe('deinitialize_state instruction', () => {
+    before(async () => {
+      await program.rpc.deinitializeState({
+        accounts: {
+          authority: authority.publicKey,
+          state: stateKey
+        },
+        signers: [authority]
+      })
+    })
+
+    it('closes the global state account', async () => {
+      const state = await program.account.state.fetchNullable(stateKey)
+      assert.isNull(state)
     })
   })
 })

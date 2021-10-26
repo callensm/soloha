@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+pub mod deinitialize_state;
 pub mod deregister;
 pub mod gm;
-pub mod initialize;
+pub mod initialize_state;
 pub mod register;
 
+pub use deinitialize_state::*;
 pub use deregister::*;
 pub use gm::*;
-pub use initialize::*;
+pub use initialize_state::*;
 pub use register::*;

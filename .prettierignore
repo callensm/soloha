@@ -4,6 +4,5 @@
 
 .next/
 build/
-lib/
 node_modules/
 public/

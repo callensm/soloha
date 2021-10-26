@@ -3,7 +3,23 @@ export type Soloha = {
   "name": "soloha",
   "instructions": [
     {
-      "name": "initialize",
+      "name": "deinitializeState",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initializeState",
       "accounts": [
         {
           "name": "authority",
@@ -251,7 +267,23 @@ export const IDL: Soloha = {
   "name": "soloha",
   "instructions": [
     {
-      "name": "initialize",
+      "name": "deinitializeState",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initializeState",
       "accounts": [
         {
           "name": "authority",

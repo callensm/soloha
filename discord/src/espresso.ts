@@ -1,7 +1,8 @@
 import { readFileSync } from 'fs'
 import { Client, Intents, Message } from 'discord.js'
 import { web3, Program, Provider, Wallet } from '@project-serum/anchor'
-import { IDL, Soloha } from './idl/soloha'
+import { Soloha } from './idl/soloha'
+import idl from './idl/soloha.json'
 import { getUserAddressAndBump, hashAuthorTag } from './util'
 
 export type EspressoParameters = {
@@ -64,7 +65,7 @@ export default class Espresso {
   async initialize() {
     const wallet = new Wallet(this.keypair)
     const provider = new Provider(new web3.Connection(this.params.clusterEndpoint), wallet, {})
-    this.program = new Program<Soloha>(IDL, Espresso.PROGRAM_ID, provider)
+    this.program = new Program<Soloha>(idl as any, Espresso.PROGRAM_ID, provider)
 
     const [key] = await web3.PublicKey.findProgramAddress(
       [Buffer.from('state')],
@@ -94,7 +95,7 @@ export default class Espresso {
    * @private
    * @memberof Espresso
    */
-  private _onReady() {
+  private _onReady = () => {
     console.log(`Logged in as ${this.client.user?.tag}`)
   }
 
@@ -105,7 +106,7 @@ export default class Espresso {
    * @param {Message} msg
    * @memberof Espresso
    */
-  private async _onMessage(msg: Message) {
+  private _onMessage = async (msg: Message) => {
     if (msg.channelId !== this.params.channelId || msg.author.bot) return
 
     const isGm: boolean = this.params.acceptedGms.some(gm => msg.content.trim().startsWith(gm))
@@ -129,7 +130,7 @@ export default class Espresso {
         })
 
         const tx = this.program!.transaction.gm(
-          { value: tagHash },
+          { value: tagHash.toJSON().data },
           {
             accounts: {
               authority: this.keypair.publicKey,
