@@ -9,7 +9,7 @@ env:
   NODE_VERSION: 16
 
 jobs:
-  lint_ts:
+  prettier:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -21,22 +21,51 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
 
-      - name: Install Root Dependencies
+      - name: Install Dependencies
         run: npm ci
-
-      - name: Install App Dependencies
-        working-directory: app
-        run: npm ci
-
-      - name: Install Discord Dependencies
-        working-directory: discord
-        run: npm ci
-
-      - name: Lint
-        run: npm run lint:app && npm run lint:discord
 
       - name: Format Check
         run: npm run fmt
+
+  lint_app:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Nodejs
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install Dependencies
+        working-directory: app
+        run: npm ci
+
+      - name: ESLint
+        working-directory: app
+        run: npm run lint
+
+  lint_discord:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Nodejs
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install Dependencies
+        working-directory: discord
+        run: npm ci
+
+      - name: ESLint
+        working-directory: discord
+        run: npm run lint
 
   lint_program:
     runs-on: ubuntu-latest

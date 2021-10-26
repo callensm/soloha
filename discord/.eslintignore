@@ -1,0 +1,8 @@
+.env*
+next.config.js
+src/lib/idl/*
+
+.next/
+build/
+lib/
+node_modules/
