@@ -5,7 +5,7 @@
   "scripts": {
     "build": "rm -rf .next/ && NODE_ENV=production next build",
     "lint": "next lint",
-    "start:dev": "next dev",
+    "dev": "next dev",
     "start": "next start -p $PORT"
   },
   "dependencies": {

@@ -1,5 +1,5 @@
 import { CSSProperties, FunctionComponent } from 'react'
-import { Layout, Space } from 'antd'
+import { Layout, Space, Tag } from 'antd'
 import ConnectButton from './ConnectButton'
 import DiscordAuthentication from './DiscordAuthentication'
 
@@ -11,6 +11,7 @@ const Header: FunctionComponent<HeaderProps> = _props => {
       <Space size="large">
         <DiscordAuthentication />
         <ConnectButton />
+        <Tag color="cyan">devnet</Tag>
       </Space>
     </Layout.Header>
   )
