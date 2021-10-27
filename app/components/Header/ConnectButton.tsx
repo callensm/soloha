@@ -5,6 +5,7 @@ import { WalletNotConnectedError } from '@solana/wallet-adapter-base'
 import { useWalletModal } from '@solana/wallet-adapter-react-ui'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { notifyWalletConnectionStatus } from '../../lib/notifications'
+import { truncatePublicKey } from '../../lib/util'
 
 interface ConnectButtonProps {}
 
@@ -78,7 +79,5 @@ const ConnectButton: FunctionComponent<ConnectButtonProps> = _props => {
     </>
   )
 }
-
-const truncatePublicKey = (key: string) => `${key.substr(0, 5)}...${key.substr(key.length - 5)}`
 
 export default ConnectButton

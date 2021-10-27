@@ -2,14 +2,6 @@ import { web3 } from '@project-serum/anchor'
 import crc32 from 'crc-32'
 
 /**
- * Creates the stringified CRC-32 hash of the argued
- * Discord user tag.
- * @param {string} tag
- * @returns {Buffer}
- */
-export const hashDiscordTag = (tag: string): Buffer => Buffer.from(crc32.str(tag).toString(16))
-
-/**
  * Derives the public key and bump nonce for the global `State` PDA
  * using the static seed string.
  * @param {web3.PublicKey} programId
@@ -32,3 +24,14 @@ export const getUserProgramAddress = (
   programId: web3.PublicKey
 ): Promise<[web3.PublicKey, number]> =>
   web3.PublicKey.findProgramAddress([Buffer.from('user'), tagHash], programId)
+
+/**
+ * Creates the stringified CRC-32 hash of the argued
+ * Discord user tag.
+ * @param {string} tag
+ * @returns {Buffer}
+ */
+export const hashDiscordTag = (tag: string): Buffer => Buffer.from(crc32.str(tag).toString(16))
+
+export const truncatePublicKey = (key: string) =>
+  `${key.substr(0, 5)}...${key.substr(key.length - 5)}`
