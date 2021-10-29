@@ -24,7 +24,7 @@ const HomePage: NextPage = () => {
   const [session] = useSession()
   const { state } = useGlobalState()
 
-  useEffect(() => setTag(session?.user?.name ?? null), [session])
+  useEffect(() => setTag(session?.user?.name ?? null), [session, setTag])
 
   return (
     <>

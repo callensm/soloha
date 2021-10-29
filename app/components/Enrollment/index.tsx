@@ -1,5 +1,5 @@
 import { CSSProperties, FunctionComponent, useCallback, useState } from 'react'
-import { Avatar, Comment, Spin } from 'antd'
+import { Avatar, Comment, Skeleton, Spin } from 'antd'
 import { web3 } from '@project-serum/anchor'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import dayjs from 'dayjs'
@@ -57,26 +57,28 @@ const Enrollment: FunctionComponent = () => {
     } finally {
       setLoading(false)
     }
-  }, [tag, user, program, publicKey, sendTransaction, connection])
+  }, [tag, user, program, publicKey, sendTransaction, connection, state])
 
   return (
     <Spin spinning={loading}>
       <div style={containerStyle}>
-        <Comment
-          author="Espresso"
-          avatar={<Avatar src="/anchor_logo.png" size="large" shape="circle" />}
-          content="gm - react to my message to register or deregister"
-          datetime={`Today at ${dayjs().format('h:mm A')}`}
-          actions={[
-            <Coffee
-              key="coffee-tag"
-              count={state?.account.registered.toString() ?? '?'}
-              enabled={publicKey !== null && tag !== null && ready}
-              isRegistered={user !== null}
-              onClick={handleCoffeeClick}
-            />
-          ]}
-        />
+        <Skeleton loading={state === null} paragraph={{ rows: 2, width: 300 }} avatar active>
+          <Comment
+            author="Espresso"
+            avatar={<Avatar src="/anchor_logo.png" size="large" shape="circle" />}
+            content="gm - react to my message to register or deregister"
+            datetime={`Today at ${dayjs().format('h:mm A')}`}
+            actions={[
+              <Coffee
+                key="coffee-tag"
+                count={state?.account.registered.toString() ?? '?'}
+                enabled={publicKey !== null && tag !== null && ready}
+                isRegistered={user !== null}
+                onClick={handleCoffeeClick}
+              />
+            ]}
+          />
+        </Skeleton>
       </div>
     </Spin>
   )
