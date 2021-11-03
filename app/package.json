@@ -15,6 +15,7 @@
     "@solana/wallet-adapter-react": "^0.12.5",
     "@solana/wallet-adapter-react-ui": "^0.5.1",
     "@solana/wallet-adapter-wallets": "^0.10.1",
+    "@solana/web3.js": "^1.30.2",
     "antd": "^4.16.13",
     "crc-32": "^1.2.0",
     "dayjs": "^1.10.7",
